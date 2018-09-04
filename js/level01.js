@@ -12,11 +12,10 @@ Level01.prototype.create = function() {
     // Create ship
     ship.sprite = game.add.sprite(320, 500, ship.spriteName, 2);
 
-    this.stone = game.add.sprite(380, 500, "stone01", 3);
-    var stone = this.stone;
-    
-    game.physics.arcade.enable([ship.sprite, stone], Phaser.Physics.ARCADE);
-    game.physics.arcade.gravity.y = 200;
+    //this.stone = game.add.sprite(380, 500, "stone01", 3);
+    //var stone = this.stone;
+
+    game.physics.arcade.enable(ship.sprite, Phaser.Physics.ARCADE);
 
     var scale = ship.width / ship.sprite.width;
     ship.height = scale * ship.sprite.height;
@@ -31,18 +30,20 @@ Level01.prototype.create = function() {
     ship.sprite.body.enable = true;
 
     
+    this.createEnemies();
+    
     //game.physics.arcade.enable(stone);
-    stone.body.collideWorldBounds = true;
-    stone.body.maxVelocity.set(ship.maxSpeed);
-    stone.body.mass = ship.mass * 100;
-    stone.body.enable = true;
+    //stone.body.collideWorldBounds = true;
+    //stone.body.maxVelocity.set(ship.maxSpeed);
+    //stone.body.mass = ship.mass * 100;
+    //stone.body.enable = true;
     
     
     //ship.sprite.body.bounce.y = 0.95;
 	ship.sprite.body.collideWorldBounds = true;
     
-    stone.body.allowGravity = false;
-	stone.body.immovable = true;
+    //stone.body.allowGravity = false;
+	//stone.body.immovable = true;
 
     //game.physics.arcade.enable([ship.sprite, stone]);
 
@@ -81,8 +82,6 @@ Level01.prototype.create = function() {
 };
 
 Level01.prototype.update = function() {
-    this.gameConfig.game.physics.arcade.collide(this.ship.sprite, this.stone);
-
     var cursors = this.cursors;
     var wasd = this.wasd;
 
@@ -101,6 +100,9 @@ Level01.prototype.update = function() {
     if (this.fireButton.isDown || wasd.fire.isDown) {
         this.ship.weapon.sprite.fire();
     }
+
+    this.gameConfig.game.physics.arcade.collide(this.ship.sprite, this.enemies);
+    this.gameConfig.game.physics.arcade.overlap(this.ship.weapon.bullets, this.enemies, this.hitEnemy, null, this.gameConfig.game);
 }
 
 Level01.prototype.timer = function() {
@@ -127,12 +129,37 @@ Level01.prototype.render = function() {
     this.ship.weapon.sprite.debug();    
 }
 
+Level01.prototype.createEnemies = function () {
+    // https://phaser.io/examples/v2/games/invaders
+    var game = this.gameConfig.game;
+    
+    this.enemies = game.add.group();
+    this.enemies.enableBody = true;
+    this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
+
+    var asteroid = this.enemies.create(380, 500, "stone01");
+    asteroid.enableBody = true;
+    //game.physics.arcade.enable(asteroid, Phaser.Physics.ARCADE);
+
+    asteroid.physicsBodyType = Phaser.Physics.ARCADE;
+    asteroid.name = "asteroid";
+    asteroid.body.immovable = true;
+}
+
+Level01.prototype.hitEnemy = function (bullet, enemy) {
+    console.log("Hit");
+    console.log(enemy);
+    
+    enemy.kill();
+    bullet.kill;
+}
+
 Level01.prototype.configureShip = function() {
     var weapon = {
         spriteName: 'bullet',
         maxBullets: 40,
         bulletAngleOffset: 90,
-        bulletSpeed: 1000,
+        bulletSpeed: 1500,
         fireRate: 100,
         fireAngle: Phaser.ANGLE_RIGHT,
         sprite: undefined
