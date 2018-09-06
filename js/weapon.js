@@ -55,13 +55,13 @@ var Weapon = {};
 //  A single bullet is fired in front of the ship //
 ////////////////////////////////////////////////////
 
-Weapon.SingleBullet = function (game) {
+Weapon.SingleBullet = function (game, bulletSpeed, fireRate) {
 
     Phaser.Group.call(this, game, game.world, 'Single Bullet', false, true, Phaser.Physics.ARCADE);
 
     this.nextFire = 0;
-    this.bulletSpeed = 600;
-    this.fireRate = 100;
+    this.bulletSpeed = bulletSpeed;
+    this.fireRate = fireRate;
 
     for (var i = 0; i < 64; i++)
     {

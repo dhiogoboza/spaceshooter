@@ -6,27 +6,54 @@ var Level01 = function (gameConfig) {
 
     this.ship = null;
     this.cursors = null;
+    this.wasd = null;
     this.speed = 300;
 
     this.weapons = [];
     this.currentWeapon = 0;
     this.weaponName = null;
     
-    this.keyPressed = false;
+    this.horizontalKeyPressed = false;
+    this.verticalKeyPressed = false;
 
     this.configureShip();
     this.configureLevel();
 };
 
 Level01.prototype = {
-    create: function() {
-        var game = this.gameConfig.game;
-        var ship = this.ship;
 
-        this.background = game.add.tileSprite(0, 0, this.gameConfig.config.width, this.gameConfig.config.height, 'background');
+    init: function () {
+        this.game.renderer.renderSession.roundPixels = true;
+        this.physics.startSystem(Phaser.Physics.ARCADE);
+    },
+
+    preload: function() {
+        this.load.image('bullet', '/assets/sprites/bullet.png');
+        this.load.image('ship', '/assets/sprites/shmup-ship2.png');
+        this.load.image('stone01', '/assets/particlestorm/particles/barkshard.png');
+        this.load.image('map01', 'assets/pics/ra_einstein.png');
+
+        this.load.image('background', '/assets/skies/deep-space.jpg');
+        this.load.image('foreground', '/assets/wip/karamoon.png');
+        this.load.bitmapFont('shmupfont', '/assets/fonts/shmupfont.png', '/assets/shmupfont.xml');
+
+        for (var i = 1; i <= 11; i++) {
+            this.load.image('bullet' + i, '/assets/bullets/bullet' + (i < 10 ? "0" : "") + i + '.png');
+        }
+    },
+
+    create: function() {
+        var game = this.game;
+        var ship = this.ship;
+        
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        game.renderer.renderSession.roundPixels = true;
+        game.time.events.loop(this.gameConfig.timerDelay, this.timer, this);
+
+        this.background = game.add.tileSprite(0, 0, this.gameConfig.width, this.gameConfig.height, 'background');
         this.background.autoScroll(-40, 0);
         
-        this.foreground = game.add.tileSprite(0, 0, this.gameConfig.config.width, this.gameConfig.config.height, 'foreground');
+        this.foreground = game.add.tileSprite(0, 0, this.gameConfig.width, this.gameConfig.height, 'foreground');
         this.foreground.autoScroll(-60, 0);
 
         // Create ship
@@ -102,7 +129,9 @@ Level01.prototype = {
         });*/
       
 
-        this.weapons.push(new Weapon.SingleBullet(game));
+        var weaponConfigs = this.map.weapon;
+
+        this.weapons.push(new Weapon.SingleBullet(game, weaponConfigs.singleBullet.bulletSpeed, weaponConfigs.singleBullet.fireRate));
         this.weapons.push(new Weapon.FrontAndBack(game));
         this.weapons.push(new Weapon.ThreeWay(game));
         this.weapons.push(new Weapon.EightWay(game));
@@ -117,8 +146,7 @@ Level01.prototype = {
 
         this.currentWeapon = 0;
 
-        for (var i = 1; i < this.weapons.length; i++)
-        {
+        for (var i = 1; i < this.weapons.length; i++) {
             this.weapons[i].visible = false;
         }
 
@@ -133,15 +161,12 @@ Level01.prototype = {
         this.fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
     },
     
-nextWeapon: function () {
+    nextWeapon: function () {
 
         //  Tidy-up the current weapon
-        if (this.currentWeapon > 9)
-        {
+        if (this.currentWeapon > 9) {
             this.weapons[this.currentWeapon].reset();
-        }
-        else
-        {
+        } else {
             this.weapons[this.currentWeapon].visible = false;
             this.weapons[this.currentWeapon].callAll('reset', null, 0, 0);
             this.weapons[this.currentWeapon].setAll('exists', false);
@@ -150,8 +175,7 @@ nextWeapon: function () {
         //  Activate the new one
         this.currentWeapon++;
 
-        if (this.currentWeapon === this.weapons.length)
-        {
+        if (this.currentWeapon === this.weapons.length) {
             this.currentWeapon = 0;
         }
 
@@ -168,18 +192,18 @@ nextWeapon: function () {
 
         if (cursors.left.isDown || wasd.left.isDown) {
             this.ship.sprite.body.velocity.x -= this.ship.acceleration;
-            this.keyPressed = true;
+            this.verticalKeyPressed = true;
         } else if (cursors.right.isDown || wasd.right.isDown) {
             this.ship.sprite.body.velocity.x += this.ship.acceleration;
-            this.keyPressed = true;
+            this.verticalKeyPressed = true;
         }
 
         if (cursors.up.isDown || wasd.up.isDown) {
             this.ship.sprite.body.velocity.y -= this.ship.acceleration;
-            this.keyPressed = true;
+            this.horizontalKeyPressed = true;
         } else if (cursors.down.isDown || wasd.down.isDown) {
             this.ship.sprite.body.velocity.y += this.ship.acceleration;
-            this.keyPressed = true;
+            this.horizontalKeyPressed = true;
         }
 
         if (this.fireButton.isDown || wasd.fire.isDown) {
@@ -187,18 +211,18 @@ nextWeapon: function () {
             this.weapons[this.currentWeapon].fire(this.ship.sprite);
         }
 
-        this.gameConfig.game.physics.arcade.collide(this.ship.sprite, this.enemies);
-        this.gameConfig.game.physics.arcade.collide(this.ship.weapon.bullets, this.enemies, this.hitEnemy);
-
-        this.gameConfig.game.physics.arcade.overlap(this.ship.weapon.bullets, this.enemies, this.hitEnemy, null, this.gameConfig.game);
+        this.game.physics.arcade.collide(this.ship.sprite, this.enemies);
+        //this.gameConfig.game.physics.arcade.collide(this.ship.weapon.bullets, this.enemies, this.hitEnemy);
+        //this.gameConfig.game.physics.arcade.overlap(this.ship.weapon.bullets, this.enemies, this.hitEnemy, null, this.gameConfig.game);
+        
+        this.game.physics.arcade.overlap(this.weapons[this.currentWeapon], this.enemies, this.hitEnemy, null, this.gameConfig.game);
     },
 
     timer: function() {
         var ship = this.ship;
 
-
         if (ship.dragForce) {
-            if (!this.keyPressed) {
+            if (!this.horizontalKeyPressed) {
                 if (ship.sprite.body.velocity.x < 10 && ship.sprite.body.velocity.x > -10) {
                     ship.sprite.body.velocity.x = 0;
                 } else if (ship.sprite.body.velocity.x < 0) {
@@ -206,7 +230,9 @@ nextWeapon: function () {
                 } else if (ship.sprite.body.velocity.x > 0) {
                     ship.sprite.body.velocity.x -= ship.dragForce;
                 }
-
+            }
+            
+            if (!this.verticalKeyPressed) {
                 if (ship.sprite.body.velocity.y < 10 && ship.sprite.body.velocity.y > -10) {
                     ship.sprite.body.velocity.y = 0;
                 } else if (ship.sprite.body.velocity.y < 0) {
@@ -216,7 +242,8 @@ nextWeapon: function () {
                 }
             }
             
-            this.keyPressed = false;
+            this.horizontalKeyPressed = false;
+            this.verticalKeyPressed = false;
         }
     },
 
@@ -226,7 +253,7 @@ nextWeapon: function () {
 
     createEnemies: function () {
         // https://phaser.io/examples/v2/games/invaders
-        var game = this.gameConfig.game;
+        var game = this.game;
         
         this.enemies = game.add.group();
         this.enemies.enableBody = true;
@@ -262,8 +289,8 @@ nextWeapon: function () {
 
         this.ship = {
             spriteName: 'ship',
-            acceleration: 200,
-            dragForce: 200,
+            acceleration: 500,
+            dragForce: 250,
             maxSpeed: 1000,
             mass: 100,
             width: 50,
@@ -279,6 +306,12 @@ nextWeapon: function () {
                 count: 10,
                 lesser: {mass: 50, size: 10},
                 greatter: {mass: 200, size: 150}
+            },
+            weapon: {
+                singleBullet: {
+                    fireRate: 50,
+                    bulletSpeed: 1500
+                }
             }
         }
     }
