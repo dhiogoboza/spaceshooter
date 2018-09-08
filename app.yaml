@@ -19,6 +19,14 @@ handlers:
   static_files: index.html
   upload: index.html
 
+- url: /res/(.*)
+  static_files: res/\1
+  upload: res/(.*)
+
+- url: /assets/(.*)
+  static_files: assets/\1
+  upload: assets/(.*)
+
 - url: /css/(.*)
   static_files: css/\1
   upload: css/(.*)
