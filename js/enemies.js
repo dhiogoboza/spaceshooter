@@ -12,7 +12,7 @@ var Asteroid = function(game, spriteName, mapWidth, mapHeight) {
     this.mass = 100;
     this.velocity = -100;
 
-    this.initialLife = this.life = 40;
+    this.initialLife = this.life = 20;
     this.name = "asteroid";
     this.visible = false;
 }
@@ -31,7 +31,7 @@ var RotatorEnemy = function(game, spriteName, mapWidth, mapHeight) {
     this.mass = 50;
     this.velocity = -150;
 
-    this.initialLife = this.life = 20;
+    this.initialLife = this.life = 10;
     this.name = "rotatorEnemy";
     this.visible = false;
 }

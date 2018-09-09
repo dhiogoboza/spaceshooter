@@ -30,12 +30,13 @@ Level01.prototype = {
     preload: function() {
         var sprites = [
             ['bullet', '/assets/sprites/bullet.png'],
-            ['ship', '/assets/sprites/shmup-ship2.png'],
+            ['ship', '/res/players/playerShip1_blue.png'],
             ['stone01', '/assets/particlestorm/particles/barkshard.png'],
             ['map01', 'assets/pics/ra_einstein.png'],
-            ['background', '/assets/skies/deep-space.jpg'],
+            ['background', '/res/bgs/purple.png'],
             ['foreground', '/assets/wip/karamoon.png'],
-            ['enemy01', '/res/enemies/ufoRed.png']
+            ['enemy01', '/res/enemies/ufoRed.png'],
+            ['membrane', '/res/organelles/membrane.png']
         ];
         
         var spritesheets = [
@@ -68,8 +69,15 @@ Level01.prototype = {
         this.background = game.add.tileSprite(0, 0, this.config.width, this.config.height, 'background');
         this.background.autoScroll(-40, 0);
         
-        this.foreground = game.add.tileSprite(0, 0, this.config.width, this.config.height, 'foreground');
+        var fh = 600;
+        this.foreground = game.add.tileSprite(0, this.config.height - fh, this.config.width, fh, 'foreground');
         this.foreground.autoScroll(-60, 0);
+
+        var mh = 200;
+        this.target = game.add.sprite(2000, -100, "membrane");
+        game.physics.arcade.enable(this.target, Phaser.Physics.ARCADE);
+        this.target.body.immovable = true;
+        this.target.body.moves = false;
 
         // Create ship
         ship.sprite = game.add.sprite(320, 500, ship.spriteName, 2);
@@ -97,6 +105,8 @@ Level01.prototype = {
             fire: game.input.keyboard.addKey(Phaser.Keyboard.K),
         };
         this.fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+        
+        this.foreground.bringToTop();
     },
     
     createWeapons: function() {
@@ -141,15 +151,16 @@ Level01.prototype = {
         }
 
         this.weapons[this.currentWeapon].visible = true;
-
         this.weaponName.text = this.weapons[this.currentWeapon].name;
-
     },
 
     update: function() {
         // ---> http://jsbin.com/pinone/1/edit?js,output
+        var weapon = this.weapons[this.currentWeapon];
         this.game.physics.arcade.collide(this.ship.sprite, this.enemies);
-        this.game.physics.arcade.overlap(this.weapons[this.currentWeapon], this.enemies, this.hitEnemy, null, this.game);
+        this.game.physics.arcade.collide(this.ship.sprite, this.target);
+        this.game.physics.arcade.overlap(weapon, this.enemies, this.hitEnemy, null, this.game);
+        this.game.physics.arcade.overlap(weapon, this.target, this.hitTarget, null, this.game);
     },
 
     timer: function() {
@@ -197,6 +208,12 @@ Level01.prototype = {
         for (var i = 0; i < this.enemies.length; i++) {
             this.enemies.children[i].timer();
         }
+        
+        this.target.x += this.map.target.speed;
+        if (this.target.x < this.map.target.x) {
+            console.log("level 1 qeustion");
+            startLevel(constants.MAP_01);
+        }
     },
 
     render: function() {
@@ -222,6 +239,10 @@ Level01.prototype = {
 
     hitEnemy: function (bullet, enemy) {
         enemy.hit(bullet.damage);
+        bullet.kill();
+    },
+
+    hitTarget: function(target, bullet) {
         bullet.kill();
     },
 
@@ -251,6 +272,10 @@ Level01.prototype = {
 
     configureLevel: function() {
         this.map = {
+            target: {
+                speed: -1,
+                x: 800,
+            },
             stones: {
                 count: 10,
                 lesser: {mass: 50, size: 10},

@@ -4,7 +4,7 @@ var Bullet = function (game, damage, key) {
 
     this.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
-    this.anchor.set(0.5);
+    this.anchor.set(0.0, 0.0);
 
     this.checkWorldBounds = true;
     this.outOfBoundsKill = true;
@@ -81,8 +81,8 @@ Weapon.SingleBullet.prototype.fire = function (source) {
 
     if (this.game.time.time < this.nextFire) { return; }
 
-    var x = source.x + 10;
-    var y = source.y + 10;
+    var x = source.x + (source.width / 2);
+    var y = source.y + (source.height / 2) - 5;
 
     this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 0);
 
