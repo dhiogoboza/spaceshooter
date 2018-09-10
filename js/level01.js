@@ -27,10 +27,10 @@ Level01.prototype = {
         this.physics.startSystem(Phaser.Physics.ARCADE);
     },
 
-    preload: function() {
+    loadSprites: function(game) {
         var sprites = [
             ['bullet', '/assets/sprites/bullet.png'],
-            ['ship', '/res/players/playerShip1_blue.png'],
+            ['ship', '/res/players/spaceShips_003.png'],
             ['stone01', '/assets/particlestorm/particles/barkshard.png'],
             ['map01', 'assets/pics/ra_einstein.png'],
             ['background', '/res/bgs/purple.png'],
@@ -39,31 +39,28 @@ Level01.prototype = {
             ['membrane', '/res/organelles/membrane.png']
         ];
         
+        for (var i = 1; i <= 11; i++) {
+            sprites.push(['bullet' + i, '/assets/bullets/bullet' + (i < 10 ? "0" : "") + i + '.png']);
+        }
+        
         var spritesheets = [
             ['explosion', 'assets/games/invaders/explode.png', 128, 128]
         ];
         
         for (var i = 0; i < sprites.length; i++) {
-            this.load.image(sprites[i][0], sprites[i][1]);
+            game.load.image(sprites[i][0], sprites[i][1]);
         }
         
         for (var i = 0; i < spritesheets.length; i++) {
             var sheet = spritesheets[i];
-            this.load.spritesheet(sheet[0], sheet[1], sheet[2], sheet[3]);
+            game.load.spritesheet(sheet[0], sheet[1], sheet[2], sheet[3]);
         }
 
-        this.load.bitmapFont('shmupfont', '/assets/fonts/shmupfont.png', '/assets/shmupfont.xml');
-
-        for (var i = 1; i <= 11; i++) {
-            this.load.image('bullet' + i, '/assets/bullets/bullet' + (i < 10 ? "0" : "") + i + '.png');
-        }
     },
 
     create: function() {
         var ship = this.ship;
         
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        game.renderer.renderSession.roundPixels = true;
         game.time.events.loop(this.config.timerDelay, this.timer, this);
 
         this.background = game.add.tileSprite(0, 0, this.config.width, this.config.height, 'background');
