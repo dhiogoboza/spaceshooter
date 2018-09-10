@@ -7,7 +7,7 @@ var constants = {
 };
 
 var gameConfig = {
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     width: constants.FULLSCREEN,
     height: constants.FULLSCREEN,
     timerDelay: 50
@@ -44,16 +44,8 @@ var Load = {
  
         // what to do when a file as completed downloading
         game.load.onFileComplete.add(function (progress, key, success, loaded, total) {
- 
             loadSprite.width = game.width * (progress / 100);
             loadSprite.x = game.world.centerX - loadSprite.width / 2;
- 
-            console.log('progress: ' + progress);
-            console.log('key: ' + key);
-            console.log('success: ' + success);
-            console.log('loaded: ' + loaded + '\/' + total);
-            console.log('**********');
- 
         }, this);
  
         // start loading the asset files

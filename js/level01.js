@@ -198,7 +198,6 @@ Level01.prototype = {
         }
 
         if (this.fireButton.isDown || wasd.fire.isDown) {
-            //this.ship.weapon.sprite.fire();
             this.weapons[this.currentWeapon].fire(this.ship.sprite);
         }
         
@@ -208,7 +207,6 @@ Level01.prototype = {
         
         this.target.x += this.map.target.speed;
         if (this.target.x < this.map.target.x) {
-            console.log("level 1 qeustion");
             startLevel(constants.MAP_01);
         }
     },
