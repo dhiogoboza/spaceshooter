@@ -55,7 +55,6 @@ Level01.prototype = {
             var sheet = spritesheets[i];
             game.load.spritesheet(sheet[0], sheet[1], sheet[2], sheet[3]);
         }
-
     },
 
     create: function() {

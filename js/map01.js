@@ -19,6 +19,7 @@ Map01.prototype = {
     },
 
     create: function() {
+        console.log("map01 create");
         this.selectLevel = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
         game.stage.backgroundColor = "#000000";
         game.add.image(game.world.centerX, game.world.centerY, 'map_01').anchor.set(0.5);

@@ -2,6 +2,7 @@ var constants = {
     FULLSCREEN: -1,
     BOOT: "boot",
     LOAD: "load",
+    MENU: "menu",
     MAP_01: "map01",
     LEVEL_01: "level01"
 };
@@ -59,13 +60,20 @@ var Load = {
 
     // when done create will be called
     create : function () {
-        console.log('ready to rock!');
-        startLevel(constants.MAP_01);
+        console.log('load create');
+        startLevel(constants.MENU);
     }
  
 };
 
 window.onload = function() {
+    var output = new FontFaceObserver('KenvectorFuture');
+    output.load().then(function () {
+        initGame();
+    });
+};
+
+function initGame() {
     var gameContainer = document.getElementById("game-content");
     var width = gameConfig.width;
     var height = gameConfig.height;
@@ -80,22 +88,26 @@ window.onload = function() {
     
     game = new Phaser.Game(width, height, gameConfig.type, gameContainer);
 
-    map01 = new Map01(gameConfig);
+    var map01 = new Map01(gameConfig);
     levels[constants.MAP_01] = map01;
 
-    level01 = new Level01(gameConfig);
+    var level01 = new Level01(gameConfig);
     levels[constants.LEVEL_01] = level01;
+
+    var menu = new Menu(gameConfig);
+    levels[constants.MENU] = menu;
 
     currentLevel = constants.MAP_01;
 
-    game.state.add(constants.MAP_01, map01);
-    game.state.add(constants.LEVEL_01, level01);
-    
     game.state.add(constants.BOOT, Boot);
     game.state.add(constants.LOAD, Load);
 
+    game.state.add(constants.MENU, menu);
+    game.state.add(constants.MAP_01, map01);
+    game.state.add(constants.LEVEL_01, level01);
+
     startLevel(constants.BOOT);
-};
+}
 
 function startLevel(levelName) {
     console.log("Starting level " + currentLevel);
