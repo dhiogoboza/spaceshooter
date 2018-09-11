@@ -17,7 +17,7 @@ Menu.prototype = {
             ['menu.yellowButton', '/res/ui/buttonYellow.png']
         ];
         
-        game.load.spritesheet('button', '/res/ui/buttons.png', 221, 39);
+        game.load.spritesheet('button', '/res/ui/buttons.png', 222, 39);
         
         for (var i = 0; i < sprites.length; i++) {
             game.load.image(sprites[i][0], sprites[i][1]);
@@ -36,19 +36,31 @@ Menu.prototype = {
         graphics.beginFill(0x000000);
         // draw a rectangle
         graphics.drawRect(0, 0, game.width, game.height);
+
+        var style = {fill: '#ffffff', 'font': '80px KenvectorFuture'};
+        var text = game.add.text(game.width / 2, (game.height / 2) - 100, 'Intercelular', style);
+        text.anchor.set(0.5, 0.5);
+        text.alpha = 0;
         
-        this.createButtons();
+        
+        var tween = game.add.tween(text).to({alpha: 1}, 2000, Phaser.Easing.Linear.None, true, 0, 0, false);
+        tween.onComplete.add(this.createButtons);
     },
 
     createButtons: function() {
+        console.log("createButtons");
         this.startGameButton = new LabelButton(this.game, 0, 0, "button", "Start game", this.startGame, this, 1, 0, 2);
         this.startGameButton.anchor.set(0.5, 0.5);
         this.startGameButton.x = game.width / 2;
+        this.startGameButton.alpha = 1;
         this.startGameButton.y = game.height / 2;
+        //this.startGameButton.y = -this.startGameButton.height;
+
+        //game.add.tween(this.startGameButton).to({ y: game.height / 2, alpha: 1}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
     },
 
     startGame: function() {
-        startLevel(constants.LEVEL_01);
+        startLevel(constants.MAP_01);
     },
 
     update: function() {

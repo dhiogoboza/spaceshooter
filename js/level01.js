@@ -268,7 +268,7 @@ Level01.prototype = {
         this.map = {
             target: {
                 speed: -1,
-                x: 800,
+                x: this.config.width - 300,
             },
             stones: {
                 count: 10,
