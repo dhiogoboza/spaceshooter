@@ -30,13 +30,12 @@ Level01.prototype = {
     loadSprites: function(game) {
         var sprites = [
             ['bullet', '/assets/sprites/bullet.png'],
-            ['ship', '/res/players/spaceShips_003.png'],
+            ['level01.ship', '/res/players/spaceShips_003.png'],
             ['stone01', '/assets/particlestorm/particles/barkshard.png'],
             ['map01', 'assets/pics/ra_einstein.png'],
             ['background', '/res/bgs/purple.png'],
             ['foreground', '/assets/wip/karamoon.png'],
-            ['enemy01', '/res/enemies/ufoRed.png'],
-            ['membrane', '/res/organelles/membrane.png']
+            ['enemy01', '/res/enemies/ufoRed.png']
         ];
         
         for (var i = 1; i <= 11; i++) {
@@ -70,7 +69,7 @@ Level01.prototype = {
         this.foreground.autoScroll(-60, 0);
 
         var mh = 200;
-        this.target = game.add.sprite(2000, -100, "membrane");
+        this.target = game.add.sprite(2000, -100, "map01.membrane");
         game.physics.arcade.enable(this.target, Phaser.Physics.ARCADE);
         this.target.body.immovable = true;
         this.target.body.moves = false;
@@ -252,7 +251,7 @@ Level01.prototype = {
         }
 
         this.ship = {
-            spriteName: 'ship',
+            spriteName: 'level01.ship',
             acceleration: 200,
             dragForce: 400,
             maxSpeed: 800,

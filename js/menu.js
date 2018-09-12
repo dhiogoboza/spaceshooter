@@ -37,30 +37,43 @@ Menu.prototype = {
         // draw a rectangle
         graphics.drawRect(0, 0, game.width, game.height);
 
+        this.createButtons();
+    },
+    
+    createButtons: function() {
+        this.startButton = new LabelButton(this.game, 0, 0, "button", "Start game", this.startGame, this, 1, 0, 2);
+        this.startButton.anchor.set(0.5, 0.5);
+        this.startButton.x = game.width / 2;
+        this.startButton.y = game.height / 2;
+        this.startButton.alpha = 0;
+
+        this.aboutButton = new LabelButton(this.game, 0, 0, "button", "About", this.about, this, 1, 0, 2);
+        this.aboutButton.anchor.set(0.5, 0.5);
+        this.aboutButton.x = game.width / 2;
+        this.aboutButton.y = (game.height / 2) + 50;
+        this.aboutButton.alpha = 0;
+
         var style = {fill: '#ffffff', 'font': '80px KenvectorFuture'};
         var text = game.add.text(game.width / 2, (game.height / 2) - 100, 'Intercelular', style);
         text.anchor.set(0.5, 0.5);
         text.alpha = 0;
-        
-        
-        var tween = game.add.tween(text).to({alpha: 1}, 2000, Phaser.Easing.Linear.None, true, 0, 0, false);
-        tween.onComplete.add(this.createButtons);
+        text.scope = this;
+
+        var tween = game.add.tween(text).to({alpha: 1}, 1500, Phaser.Easing.Linear.None, true, 0, 0, false);
+        tween.onComplete.add(this.showButtons);
     },
 
-    createButtons: function() {
-        console.log("createButtons");
-        this.startGameButton = new LabelButton(this.game, 0, 0, "button", "Start game", this.startGame, this, 1, 0, 2);
-        this.startGameButton.anchor.set(0.5, 0.5);
-        this.startGameButton.x = game.width / 2;
-        this.startGameButton.alpha = 1;
-        this.startGameButton.y = game.height / 2;
-        //this.startGameButton.y = -this.startGameButton.height;
-
-        //game.add.tween(this.startGameButton).to({ y: game.height / 2, alpha: 1}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+    showButtons: function(obj) {
+        obj.scope.aboutButton.alpha = 1;
+        obj.scope.startButton.alpha = 1;
     },
 
     startGame: function() {
         startLevel(constants.MAP_01);
+    },
+    
+    about: function() {
+    
     },
 
     update: function() {
@@ -78,7 +91,6 @@ Menu.prototype = {
 
 var LabelButton = function(game, x, y, key, label, callback, callbackContext, overFrame, outFrame, downFrame, upFrame) {
     Phaser.Button.call(this, game, x, y, key, callback, callbackContext, overFrame, outFrame, downFrame, upFrame);
-    //Style how you wish...
     this.style = {
         'font': '20px KenvectorFuture',
         'fill': 'black'

@@ -44,14 +44,6 @@ RotatorEnemy.prototype.constructor = RotatorEnemy;
 
 // ================ COMMON FUNCTIONS ===================== //
 
-RotatorEnemy.prototype.create = Asteroid.prototype.create = function() {
-    this.enableBody = true;
-    this.physicsBodyType = Phaser.Physics.ARCADE;
-    this.body.immovable = false;
-    this.body.mass = this.mass;
-    this.body.velocity.x = this.velocity;
-};
-
 RotatorEnemy.prototype.start = Asteroid.prototype.start = function() {
     this.visible = true;
 };
@@ -82,20 +74,29 @@ RotatorEnemy.prototype.hit = Asteroid.prototype.hit = function(damage) {
     }
 };
 
+RotatorEnemy.prototype.timer = Asteroid.prototype.timer = function() {
+    this.body.velocity.set(this.velocity, 0);
+    if (this.body.position.x < 0) {
+        this.restart();
+    }
+};
+
 // ================ CUSTOM FUNCTIONS ===================== //
 
-RotatorEnemy.prototype.timer = function() {
-    this.body.velocity.set(this.velocity, 0);
-    this.anchor.set(0.5, 0.5);
-    this.angle += 1;
-    if (this.body.position.x < 0) {
-        this.restart();
-    }
+RotatorEnemy.prototype.create = function() {
+    this.enableBody = true;
+    this.physicsBodyType = Phaser.Physics.ARCADE;
+    this.body.immovable = false;
+    this.body.mass = this.mass;
+    this.body.velocity.x = this.velocity;
+    game.add.tween(this).to( { angle: 360 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, false);
 };
 
-Asteroid.prototype.timer = function() {
-    this.body.velocity.set(this.velocity, 0);
-    if (this.body.position.x < 0) {
-        this.restart();
-    }
+Asteroid.prototype.create = function() {
+    this.enableBody = true;
+    this.physicsBodyType = Phaser.Physics.ARCADE;
+    this.body.immovable = false;
+    this.body.mass = this.mass;
+    this.body.velocity.x = this.velocity;
 };
+
