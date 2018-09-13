@@ -28,25 +28,112 @@ Map01.prototype = {
     },
 
     create: function() {
+        // init keys
         this.selectLevel = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
-        game.stage.backgroundColor = "#000000";
+        this.cursors = game.input.keyboard.createCursorKeys();
+        this.wasd = {
+            up: game.input.keyboard.addKey(Phaser.Keyboard.W),
+            down: game.input.keyboard.addKey(Phaser.Keyboard.S),
+            right: game.input.keyboard.addKey(Phaser.Keyboard.D),
+            left: game.input.keyboard.addKey(Phaser.Keyboard.A),
+            fire: game.input.keyboard.addKey(Phaser.Keyboard.K),
+        };
 
-        var background = game.add.image(game.world.centerX, game.world.centerY, 'map01.membrane');
-        background.anchor.set(0.5, 0.5);
-        var newWidth = game.height - 200;
-        var scale = newWidth / background.height;
-        background.height = newWidth;
-        background.width = background.width * scale;
+        var newHeight = game.height - 50;
+        this.aTenth = newHeight * 0.1;
+
+        game.stage.backgroundColor = "#000000";
+        this.background = game.add.image(game.world.centerX, game.world.centerY, 'map01.membrane');
+        this.background.anchor.set(0.5, 0.5);
+
+        var scale = newHeight / this.background.height;
+        this.background.height = newHeight;
+        this.background.width = this.background.width * scale;
         
-        var ship = game.add.sprite(50, game.world.centerY, "level01.ship", 2);
-        ship.anchor.set(0.5, 0.5);
-        ship.scale.setTo(scale);
-        game.add.tween(ship).to( { angle: 360 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, false);
+        this.background.x = this.background.x + (game.width - this.background.width) / 2;
+
+        this.ship = game.add.sprite(0, 0, "level01.ship", 2);
+        this.ship.anchor.set(0.5, 0.5);
+        this.ship.scale.setTo(scale);
+        this.ship.animating = false;
+        
+        game.add.tween(this.ship).to( { angle: 360 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, false);
+
+        // init map
+        this.initMap();
+        this.currentMapPostion = 0;
+        var position = this.mapPoints[this.currentMapPostion];
+        this.ship.x = position.x;
+        this.ship.y = position.y;
+    },
+
+    updateShipPosition: function() {
+        this.ship.animating = true;
+        var position = this.mapPoints[this.currentMapPostion];
+        var tween = game.add.tween(this.ship);
+        tween.onComplete.add(this.shipStopped);
+        tween.to({x: position.x, y: position.y}, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
+    },
+    
+    initMap: function() {
+        this.mapPoints = [
+            {
+                x: this.background.x - (this.background.width / 2) - (this.aTenth * 2),
+                y: game.world.centerY,
+                right: 1,
+                left: -1,
+                up: -1,
+                down: -1
+            },
+            {
+                x: this.background.x - (this.background.width / 2) + (this.aTenth * 1),
+                y: game.world.centerY,
+                right: -1,
+                left: 0,
+                up: 2,
+                down: -1
+            },
+            {
+                x: this.background.x - (this.background.width / 2) + (this.aTenth * 2),
+                y: game.world.centerY - (this.aTenth * 3),
+                right: -1,
+                left: 1,
+                up: -1,
+                down: 1
+            }
+        ]
+    },
+    
+    shipStopped: function(ship) {
+        console.log("terminou")
+        ship.animating = false;
     },
 
     update: function() {
         if (this.selectLevel.isDown) {
             startLevel(constants.LEVEL_01);
+        } else {
+            if (this.ship.animating) {
+                return;
+            }
+            var target;
+            if (this.cursors.left.isDown || this.wasd.left.isDown) {
+                target = "left";
+            } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
+                target = "right";
+            } else if (this.cursors.up.isDown || this.wasd.up.isDown) {
+                target = "up";
+            } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
+                target = "down";
+            } else {
+                return;
+            }
+
+            var position = this.mapPoints[this.currentMapPostion];
+            if (position[target] >= 0) {
+                this.currentMapPostion = position[target];
+                this.updateShipPosition();
+            }
         }
     },
 
