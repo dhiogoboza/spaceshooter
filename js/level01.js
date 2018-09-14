@@ -58,21 +58,29 @@ Level01.prototype = {
 
     create: function() {
         var ship = this.ship;
-        
-        game.time.events.loop(this.config.timerDelay, this.timer, this);
+        this.totalHeight = game.height + this.map.verticalPadding * 2;
+        this.totalWidth = game.width + this.map.verticalPadding * 2;
 
-        this.background = game.add.tileSprite(0, 0, this.config.width, this.config.height, 'background');
+        game.world.setBounds(0, 0, this.totalWidth, this.totalHeight);
+
+        this.scene = game.add.group();
+        this.scene.x = 0;
+        this.scene.y = -this.map.verticalPadding;
+
+        this.background = new Phaser.TileSprite(game, 0, 0, this.totalWidth, this.totalHeight, 'background');
         this.background.autoScroll(-40, 0);
-        
-        var fh = 600;
-        this.foreground = game.add.tileSprite(0, this.config.height - fh, this.config.width, fh, 'foreground');
+        this.scene.add(this.background);
+
+        var fh = 1200;
+        this.foreground = game.add.tileSprite(0, this.totalHeight - fh, this.totalWidth, this.totalHeight, 'foreground');
         this.foreground.autoScroll(-60, 0);
 
         var mh = 200;
-        this.target = game.add.sprite(2000, -100, "map01.membrane");
+        this.target = new Phaser.Sprite(game, 2000, -100, "map01.membrane");
         game.physics.arcade.enable(this.target, Phaser.Physics.ARCADE);
         this.target.body.immovable = true;
         this.target.body.moves = false;
+        this.scene.add(this.target);
 
         // Create ship
         ship.sprite = game.add.sprite(320, 500, ship.spriteName, 2);
@@ -87,8 +95,13 @@ Level01.prototype = {
         ship.sprite.body.maxVelocity.set(ship.maxSpeed);
         ship.sprite.body.enable = true;
         ship.sprite.body.collideWorldBounds = true;
+        
+        //game.camera.follow(ship.sprite);
+        game.camera.follow(ship.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 
         this.createEnemies();
+        this.scene.add(this.enemies);
+
         this.createWeapons();
 
         this.cursors = game.input.keyboard.createCursorKeys();
@@ -100,8 +113,9 @@ Level01.prototype = {
             fire: game.input.keyboard.addKey(Phaser.Keyboard.K),
         };
         this.fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
-        
         this.foreground.bringToTop();
+        
+        game.time.events.loop(this.config.timerDelay, this.timer, this);
     },
     
     createWeapons: function() {
@@ -124,6 +138,7 @@ Level01.prototype = {
 
         for (var i = 1; i < this.weapons.length; i++) {
             this.weapons[i].visible = false;
+            //this.scene.add(this.weapons[i]);
         }
     },
     
@@ -162,7 +177,7 @@ Level01.prototype = {
         var ship = this.ship;
         var cursors = this.cursors;
         var wasd = this.wasd;
-
+        
         if (cursors.left.isDown || wasd.left.isDown) {
             this.ship.sprite.body.velocity.x -= this.ship.acceleration;
             this.verticalKeyPressed = true;
@@ -265,6 +280,7 @@ Level01.prototype = {
 
     configureLevel: function() {
         this.map = {
+            verticalPadding: 200,
             target: {
                 speed: -1,
                 x: this.config.width - 300,

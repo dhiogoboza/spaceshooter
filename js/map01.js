@@ -50,7 +50,7 @@ Map01.prototype = {
         this.background.height = newHeight;
         this.background.width = this.background.width * scale;
         
-        this.background.x = this.background.x + (game.width - this.background.width) / 2;
+        //this.background.x = this.background.x + (game.width - this.background.width) / 2;
 
         this.ship = game.add.sprite(0, 0, "level01.ship", 2);
         this.ship.anchor.set(0.5, 0.5);
@@ -88,13 +88,13 @@ Map01.prototype = {
             {
                 x: this.background.x - (this.background.width / 2) + (this.aTenth * 1),
                 y: game.world.centerY,
-                right: -1,
+                right: 2,
                 left: 0,
                 up: 2,
                 down: -1
             },
             {
-                x: this.background.x - (this.background.width / 2) + (this.aTenth * 2),
+                x: this.background.x - (this.background.width / 2) + (this.aTenth * 3),
                 y: game.world.centerY - (this.aTenth * 3),
                 right: -1,
                 left: 1,
@@ -105,17 +105,17 @@ Map01.prototype = {
     },
     
     shipStopped: function(ship) {
-        console.log("terminou")
         ship.animating = false;
     },
 
     update: function() {
+        if (this.ship.animating) {
+            return;
+        }
+
         if (this.selectLevel.isDown) {
-            startLevel(constants.LEVEL_01);
+            startLevel("level0" + (this.currentMapPostion + 1));
         } else {
-            if (this.ship.animating) {
-                return;
-            }
             var target;
             if (this.cursors.left.isDown || this.wasd.left.isDown) {
                 target = "left";
