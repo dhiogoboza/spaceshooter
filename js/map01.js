@@ -1,33 +1,18 @@
-var Map01 = function(gameConfig) {
-    this.gameConfig = gameConfig;
-    this.background = null;
-
-    this.ship = null;
-    this.cursors = null;
-    this.wasd = null;
-    
-    this.selectLevel = null;
-} 
-
-Map01.prototype = {
+var Map01 = {
     init: function () {
         game.renderer.renderSession.roundPixels = true;
-    },
 
-    loadSprites: function(game) {
-        var sprites = [
-            ['map01.membrane', '/res/organelles/membrane.png'],
-            ['map01.mitocondria', '/res/organelles/mitocondria.png'],
-            ['map01.lisossomo', '/res/organelles/lisossomo.png'],
-            ['map01.golgi', '/res/organelles/golgi.png']
-        ];
-
-        for (var i = 0; i < sprites.length; i++) {
-            game.load.image(sprites[i][0], sprites[i][1]);
-        }
+        this.config = {};
+        this.config.verticalPadding = 500;
+        this.config.horizontalPadding = 500;
     },
 
     create: function() {
+        this.totalHeight = game.height + this.config.verticalPadding * 2;
+        this.totalWidth = game.width + this.config.horizontalPadding * 2;
+
+        game.world.setBounds(0, 0, this.totalWidth, this.totalHeight);
+        
         // init keys
         this.selectLevel = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
         this.cursors = game.input.keyboard.createCursorKeys();
@@ -39,23 +24,27 @@ Map01.prototype = {
             fire: game.input.keyboard.addKey(Phaser.Keyboard.K),
         };
 
-        var newHeight = game.height - 50;
+        var newHeight = game.height + 200;
         this.aTenth = newHeight * 0.1;
 
         game.stage.backgroundColor = "#000000";
-        this.background = game.add.image(game.world.centerX, game.world.centerY, 'map01.membrane');
+        this.background = game.add.image(this.totalWidth / 2, this.totalHeight / 2, 'map01.membrane');
         this.background.anchor.set(0.5, 0.5);
 
         var scale = newHeight / this.background.height;
         this.background.height = newHeight;
         this.background.width = this.background.width * scale;
-        
-        //this.background.x = this.background.x + (game.width - this.background.width) / 2;
 
         this.ship = game.add.sprite(0, 0, "level01.ship", 2);
         this.ship.anchor.set(0.5, 0.5);
-        this.ship.scale.setTo(scale);
         this.ship.animating = false;
+
+        // scale ship
+        var shipScale = config.shipWidth / this.ship.width;
+        this.ship.scale.setTo(shipScale);
+
+        // configure camera to follow ship smoothly
+        game.camera.follow(this.ship, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
         
         game.add.tween(this.ship).to( { angle: 360 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, false);
 
@@ -74,7 +63,7 @@ Map01.prototype = {
         tween.onComplete.add(this.shipStopped);
         tween.to({x: position.x, y: position.y}, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
     },
-    
+
     initMap: function() {
         this.mapPoints = [
             {

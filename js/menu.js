@@ -1,37 +1,14 @@
-var Menu = function(gameConfig) {
-    this.gameConfig = gameConfig;
-    this.background = null;
-} 
-
-Menu.prototype = {
+var Menu = {
     init: function () {
         game.renderer.renderSession.roundPixels = true;
     },
 
-    loadSprites: function(game) {
-        this.game.load.bitmapFont('myfont', 'assets/font/font.png', 'assets/font/font.fnt');
-
-        var sprites = [
-            ['menu.background', '/res/bgs/menu.jpg'],
-            ['menu.redButton', '/res/ui/buttonRed.png'],
-            ['menu.yellowButton', '/res/ui/buttonYellow.png']
-        ];
-        
-        game.load.spritesheet('button', '/res/ui/buttons.png', 222, 39);
-        
-        for (var i = 0; i < sprites.length; i++) {
-            game.load.image(sprites[i][0], sprites[i][1]);
-        }
-    },
-
     create: function() {
-        console.log("menu create");
-
         game.stage.backgroundColor = "#000000";
         game.add.image(game.world.centerX, game.world.centerY, 'menu.background').anchor.set(0.5);
 
         var graphics = game.add.graphics(0, 0);
-        graphics.alpha= 0.5;
+        graphics.alpha = 0.5;
         // set a fill style
         graphics.beginFill(0x000000);
         // draw a rectangle

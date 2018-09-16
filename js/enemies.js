@@ -59,8 +59,12 @@ RotatorEnemy.prototype.update = Asteroid.prototype.update = function() {
 };
 
 RotatorEnemy.prototype.hit = Asteroid.prototype.hit = function(damage) {
-    this.life -= damage;
-    
+    if (damage < 0) {
+        this.life = 0;
+    } else {
+        this.life -= damage;
+    }
+
     if (this.life <= 0) {
         var explosion = this.game.add.sprite(this.body.x, this.body.y, 'explosion');
         explosion.animations.add('explosion', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);

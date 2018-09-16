@@ -7,18 +7,19 @@ var constants = {
     LEVEL_01: "level01"
 };
 
-var gameConfig = {
+var config = {
     type: Phaser.CANVAS,
     width: constants.FULLSCREEN,
     height: constants.FULLSCREEN,
-    timerDelay: 50
+    timerDelay: 50,
+    shipWidth: 50,
+    lives: 3
 };
 
 var first = true;
 var game;
 var text;
 var currentLevel;
-var levels = {};
 
 var Boot = {
     preload : function () {
@@ -50,11 +51,43 @@ var Load = {
         }, this);
  
         // start loading the asset files
-        for (var levelName in levels) { 
-           if (levels.hasOwnProperty(levelName)) {
-               levels[levelName].loadSprites(game);
-           }
+        var sprites = [
+            ['bullet', '/assets/sprites/bullet.png'],
+            ['level01.ship', '/res/players/playerShip1_blue.png'],
+            ['stone01', '/assets/particlestorm/particles/barkshard.png'],
+            ['map01', 'assets/pics/ra_einstein.png'],
+            ['background', '/res/bgs/purple.png'],
+            ['foreground', '/assets/wip/karamoon.png'],
+            ['enemy01', '/res/enemies/ufoRed.png'],
+            ['map01.membrane', '/res/organelles/membrane.png'],
+            ['map01.mitocondria', '/res/organelles/mitocondria.png'],
+            ['map01.lisossomo', '/res/organelles/lisossomo.png'],
+            ['map01.golgi', '/res/organelles/golgi.png'],
+            ['menu.background', '/res/bgs/menu.jpg'],
+            ['menu.redButton', '/res/ui/buttonRed.png'],
+            ['menu.yellowButton', '/res/ui/buttonYellow.png'],
+            ['hud.life', '/res/ui/playerLife1_blue.png']
+        ];
+        
+        for (var i = 1; i <= 11; i++) {
+            sprites.push(['bullet' + i, '/assets/bullets/bullet' + (i < 10 ? "0" : "") + i + '.png']);
         }
+        
+        var spritesheets = [
+            ['explosion', 'assets/games/invaders/explode.png', 128, 128],
+            ['button', '/res/ui/buttons.png', 222, 39]
+        ];
+        
+        for (var i = 0; i < sprites.length; i++) {
+            game.load.image(sprites[i][0], sprites[i][1]);
+        }
+        
+        for (var i = 0; i < spritesheets.length; i++) {
+            var sheet = spritesheets[i];
+            game.load.spritesheet(sheet[0], sheet[1], sheet[2], sheet[3]);
+        }
+        
+        this.game.load.bitmapFont('myfont', 'assets/font/font.png', 'assets/font/font.fnt');
  
     },
 
@@ -75,36 +108,27 @@ window.onload = function() {
 
 function initGame() {
     var gameContainer = document.getElementById("game-content");
-    var width = gameConfig.width;
-    var height = gameConfig.height;
+    var width = config.width;
+    var height = config.height;
 
     if (width == constants.FULLSCREEN) {
-        gameConfig.width = width = window.innerWidth;
+        config.width = width = window.innerWidth;
     }
 
     if (height == constants.FULLSCREEN) {
-        gameConfig.height = height = window.innerHeight;
+        config.height = height = window.innerHeight;
     }
     
-    game = new Phaser.Game(width, height, gameConfig.type, gameContainer);
-
-    var map01 = new Map01(gameConfig);
-    levels[constants.MAP_01] = map01;
-
-    var level01 = new Level01(gameConfig);
-    levels[constants.LEVEL_01] = level01;
-
-    var menu = new Menu(gameConfig);
-    levels[constants.MENU] = menu;
+    game = new Phaser.Game(width, height, config.type, gameContainer);
 
     currentLevel = constants.MAP_01;
 
     game.state.add(constants.BOOT, Boot);
     game.state.add(constants.LOAD, Load);
 
-    game.state.add(constants.MENU, menu);
-    game.state.add(constants.MAP_01, map01);
-    game.state.add(constants.LEVEL_01, level01);
+    game.state.add(constants.MENU, Menu);
+    game.state.add(constants.MAP_01, Map01);
+    game.state.add(constants.LEVEL_01, Level01);
 
     startLevel(constants.BOOT);
 }
@@ -113,34 +137,4 @@ function startLevel(levelName) {
     console.log("Starting level " + currentLevel);
     currentLevel = levelName;
     game.state.start(levelName);
-}
-
-function createCallback() {
-    if (first) {
-        first = false;
-        game.load.onLoadStart.add(loadStart, this);
-        game.load.onFileComplete.add(fileComplete, this);
-        game.load.onLoadComplete.add(loadComplete, this);
-    }
-
-    text = game.add.text(32, 32, 'Click to start load', { fill: '#ffffff' });
-    levels[currentLevel].loadSprites();
-    game.load.start();
-}
-
-function loadStart() {
-	text.setText("Loading ...");
-	console.log("Loading ...");
-}
-
-//	This callback is sent the following parameters:
-function fileComplete(progress, cacheKey, success, totalLoaded, totalFiles) {
-    var str = "File Complete: " + progress + "% - " + totalLoaded + " out of " + totalFiles;
-	text.setText(str);
-	console.log(str);
-}
-
-function loadComplete() {
-	text.setText("Load Complete");
-	console.log("Load Complete");
 }
