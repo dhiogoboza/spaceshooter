@@ -7,17 +7,13 @@ var Level01 = {
 
         this.lives = config.lives;
 
-        this.config = {};
-        this.config.verticalPadding = 200;
-        this.config.horizontalPadding = 0;
-
         this.configureLevel();
         this.configureShip();
     },
 
     create: function() {
-        this.totalHeight = game.height + this.config.verticalPadding * 2;
-        this.totalWidth = game.width + this.config.horizontalPadding * 2;
+        this.totalHeight = game.height + this.map.verticalPadding * 2;
+        this.totalWidth = game.width + this.map.horizontalPadding * 2;
 
         game.world.setBounds(0, 0, this.totalWidth, this.totalHeight);
 
@@ -273,10 +269,12 @@ var Level01 = {
 
     configureLevel: function() {
         this.map = {
+            verticalPadding: 200,
+            horizontalPadding: 200,
             target: {
                 speed: -2,
                 targetX: config.width + (config.width * 0.2),
-                x: 2000
+                x: 4000
             },
             stones: {
                 count: 10,

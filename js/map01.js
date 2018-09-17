@@ -2,17 +2,18 @@ var Map01 = {
     init: function () {
         game.renderer.renderSession.roundPixels = true;
 
-        this.config = {};
-        this.config.verticalPadding = 500;
-        this.config.horizontalPadding = 500;
+        this.map = {
+            verticalPadding: 500,
+            horizontalPadding: 500
+        };
     },
 
     create: function() {
-        this.totalHeight = game.height + this.config.verticalPadding * 2;
-        this.totalWidth = game.width + this.config.horizontalPadding * 2;
+        this.totalHeight = game.height + this.map.verticalPadding * 2;
+        this.totalWidth = game.width + this.map.horizontalPadding * 2;
 
         game.world.setBounds(0, 0, this.totalWidth, this.totalHeight);
-        
+
         // init keys
         this.selectLevel = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
         this.cursors = game.input.keyboard.createCursorKeys();

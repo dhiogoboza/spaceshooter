@@ -59,13 +59,18 @@ var Load = {
             ['background', '/res/bgs/purple.png'],
             ['foreground', '/assets/wip/karamoon.png'],
             ['enemy01', '/res/enemies/ufoRed.png'],
+
             ['map01.membrane', '/res/organelles/membrane.png'],
             ['map01.mitocondria', '/res/organelles/mitocondria.png'],
             ['map01.lisossomo', '/res/organelles/lisossomo.png'],
             ['map01.golgi', '/res/organelles/golgi.png'],
+
             ['menu.background', '/res/bgs/menu.jpg'],
             ['menu.redButton', '/res/ui/buttonRed.png'],
             ['menu.yellowButton', '/res/ui/buttonYellow.png'],
+            ['menu.selectorRight', '/res/ui/selector_right.png'],
+            ['menu.selectorLeft', '/res/ui/selector_left.png'],
+
             ['hud.life', '/res/ui/playerLife1_blue.png']
         ];
         
