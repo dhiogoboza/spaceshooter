@@ -1,3 +1,6 @@
+var WINDOW_WIDTH =  window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
+var WINDOW_HEIGHT = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
+
 var constants = {
     FULLSCREEN: -1,
     BOOT: "boot",

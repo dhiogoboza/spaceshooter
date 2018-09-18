@@ -9,7 +9,10 @@ var Menu = {
 
     create: function() {
         game.stage.backgroundColor = "#000000";
-        game.add.image(game.world.centerX, game.world.centerY, 'menu.background').anchor.set(0.5);
+        var background = game.add.image(game.world.centerX, game.world.centerY, 'menu.background');
+        background.anchor.set(0.5);
+        background.alpha = 1;
+        game.add.tween(background).to({ alpha: 0.6 }, 2000, Phaser.Easing.Linear.None, true, 0, -1, true);
 
         var graphics = game.add.graphics(0, 0);
         graphics.alpha = 0.5;
@@ -34,19 +37,26 @@ var Menu = {
     createButtons: function() {
         this.buttons = game.add.group();
 
-        this.startButton = new LabelButton(this.game, 0, 0, "button", "Start game", this.startGame, this, 1, 0, 2);
-        this.startButton.anchor.set(0.5, 0.5);
-        this.startButton.x = game.width / 2;
-        this.startButton.y = game.height / 2;
-        this.startButton.alpha = 0;
-        this.buttons.add(this.startButton);
+        var startButton = new LabelButton(this.game, 0, 0, "button", "Start game", this.startGame, this, 1, 0, 2);
+        startButton.anchor.set(0.5, 0.5);
+        startButton.x = game.width / 2;
+        startButton.y = game.height / 2;
+        startButton.alpha = 0;
+        this.buttons.add(startButton);
 
-        this.aboutButton = new LabelButton(this.game, 0, 0, "button", "About", this.about, this, 1, 0, 2);
-        this.aboutButton.anchor.set(0.5, 0.5);
-        this.aboutButton.x = game.width / 2;
-        this.aboutButton.y = (game.height / 2) + 50;
-        this.aboutButton.alpha = 0;
-        this.buttons.add(this.aboutButton);
+        var configButton = new LabelButton(this.game, 0, 0, "button", "Config", this.configScreen, this, 1, 0, 2);
+        configButton.anchor.set(0.5, 0.5);
+        configButton.x = game.width / 2;
+        configButton.y = (game.height / 2) + 50;
+        configButton.alpha = 0;
+        this.buttons.add(configButton);
+
+        var aboutButton = new LabelButton(this.game, 0, 0, "button", "About", this.aboutScreen, this, 1, 0, 2);
+        aboutButton.anchor.set(0.5, 0.5);
+        aboutButton.x = game.width / 2;
+        aboutButton.y = (game.height / 2) + 100;
+        aboutButton.alpha = 0;
+        this.buttons.add(aboutButton);
 
         var style = {fill: '#ffffff', 'font': '80px KenvectorFuture'};
         var text = game.add.text(game.width / 2, (game.height / 2) - 100, 'Intercelular', style);
@@ -83,8 +93,10 @@ var Menu = {
     },
 
     showButtons: function(obj) {
-        obj.scope.aboutButton.alpha = 1;
-        obj.scope.startButton.alpha = 1;
+        for (var i = 0; i < obj.scope.buttons.children.length; i++) {
+            obj.scope.buttons.children[i].alpha = 1;
+        }
+
         obj.scope.selectorRight.alpha = 1;
         obj.scope.selectorLeft.alpha = 1;
     },
@@ -93,7 +105,11 @@ var Menu = {
         startLevel(constants.MAP_01);
     },
     
-    about: function() {
+    aboutScreen: function() {
+    
+    },
+
+    configScreen: function() {
     
     },
     
