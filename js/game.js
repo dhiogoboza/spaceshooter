@@ -19,6 +19,42 @@ var config = {
     lives: 3
 };
 
+var mapPoints = [[
+    {
+        x: 0,
+        y: 0,
+        color: 0xFFFFFF,
+        radius: config.shipWidth * 0.75,
+        right: 1,
+        left: -1,
+        up: -1,
+        down: -1,
+        locked: false
+    },
+    {
+        x: 0,
+        y: 0,
+        color: 0xFFFFFF,
+        radius: config.shipWidth * 0.75,
+        right: 2,
+        left: 0,
+        up: 2,
+        down: -1,
+        locked: true
+    },
+    {
+        x: 0,
+        y: 0,
+        color: 0xFFFFFF,
+        radius: config.shipWidth * 0.75,
+        right: -1,
+        left: 1,
+        up: -1,
+        down: 1,
+        locked: true
+    }
+]];
+
 var first = true;
 var game;
 var text;
@@ -67,6 +103,9 @@ var Load = {
             ['map01.mitocondria', '/res/organelles/mitocondria.png'],
             ['map01.lisossomo', '/res/organelles/lisossomo.png'],
             ['map01.golgi', '/res/organelles/golgi.png'],
+
+            ['ui.station01', '/res/ui/station01.png'],
+            ['ui.lock', '/res/ui/lock.png'],
 
             ['menu.background', '/res/bgs/menu.jpg'],
             ['menu.redButton', '/res/ui/buttonRed.png'],
@@ -145,4 +184,8 @@ function startLevel(levelName) {
     console.log("Starting level " + currentLevel);
     currentLevel = levelName;
     game.state.start(levelName);
+}
+
+function completeLevel(mapIndex, levelIndex) {
+    mapPoints[mapIndex][levelIndex + 1].locked = false;
 }

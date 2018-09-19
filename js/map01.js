@@ -54,65 +54,27 @@ var Map01 = {
         
         game.add.tween(this.ship).to( { angle: 360 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, false);
 
-        var position = this.mapPoints[this.currentMapPostion];
+        var position = mapPoints[0][this.currentMapPostion];
         this.ship.x = position.x;
         this.ship.y = position.y;
     },
 
     updateShipPosition: function() {
         this.ship.animating = true;
-        var position = this.mapPoints[this.currentMapPostion];
+        var position = mapPoints[0][this.currentMapPostion];
         var tween = game.add.tween(this.ship);
         tween.onComplete.add(this.shipStopped);
         tween.to({x: position.x, y: position.y}, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
     },
 
     initMap: function() {
-        this.mapPoints = [
-            {
-                x: this.background.x - (this.background.width / 2) - (this.aTenth * 2),
-                y: game.world.centerY,
-                color: 0xFFFFFF,
-                radius: config.shipWidth * 0.75,
-                right: 1,
-                left: -1,
-                up: -1,
-                down: -1,
-                locked: false
-            },
-            {
-                x: this.background.x - (this.background.width / 2) + (this.aTenth * 1),
-                y: game.world.centerY,
-                color: 0xFFFFFF,
-                radius: config.shipWidth * 0.75,
-                right: 2,
-                left: 0,
-                up: 2,
-                down: -1,
-                locked: true
-            },
-            {
-                x: this.background.x - (this.background.width / 2) + (this.aTenth * 3),
-                y: game.world.centerY - (this.aTenth * 3),
-                color: 0xFFFFFF,
-                radius: config.shipWidth * 0.75,
-                right: -1,
-                left: 1,
-                up: -1,
-                down: 1,
-                locked: true
-            }
-        ]
+        updateMap01(this);
     },
 
     drawMap: function() {
         var lastPoint;
-        for (var i = 0; i < this.mapPoints.length; i++) {
-            var point = this.mapPoints[i];    
-            var graphics = game.add.graphics(0, 0);
-            graphics.beginFill(point.color, 1);
-            graphics.drawCircle(point.x, point.y, point.radius);
-
+        for (var i = 0; i < mapPoints[0].length; i++) {
+            var point = mapPoints[0][i];
             if (i !== 0) {
                 var bmd = this.game.add.bitmapData(this.totalWidth, this.totalHeight);
                 bmd.ctx.beginPath();
@@ -125,8 +87,20 @@ var Map01 = {
                 bmd.ctx.closePath();
                 this.game.add.sprite(0, 0, bmd);            
             }
-
             lastPoint = point;
+        }
+
+        for (var i = 0; i < mapPoints[0].length; i++) {
+            var point = mapPoints[0][i];
+            //var graphics = game.add.graphics(0, 0);
+            //graphics.beginFill(point.color, 1);
+            //graphics.drawCircle(point.x, point.y, point.radius);
+            game.add.image(point.x, point.y, 'ui.station01').anchor.set(0.5, 0.5);
+
+            if (point.locked) {
+                var lock = game.add.image(point.x, point.y, 'ui.lock');
+                lock.anchor.set(0.5, 0.5);
+            }
         }
     },
 
@@ -155,8 +129,8 @@ var Map01 = {
                 return;
             }
 
-            var position = this.mapPoints[this.currentMapPostion];
-            if (position[target] >= 0) {
+            var position = mapPoints[0][this.currentMapPostion];
+            if (position[target] >= 0 && !mapPoints[0][position[target]].locked) {
                 this.currentMapPostion = position[target];
                 this.updateShipPosition();
             }
@@ -170,4 +144,15 @@ var Map01 = {
     render: function() {
         
     }
+}
+
+function updateMap01(map01) {
+    mapPoints[0][0].x = map01.background.x - (map01.background.width / 2) - (map01.aTenth * 2);
+    mapPoints[0][0].y = game.world.centerY;
+
+    mapPoints[0][1].x = map01.background.x - (map01.background.width / 2) + (map01.aTenth * 1.5);
+    mapPoints[0][1].y = game.world.centerY;
+
+    mapPoints[0][2].x = map01.background.x - (map01.background.width / 2) + (map01.aTenth * 3);
+    mapPoints[0][2].y = game.world.centerY - (map01.aTenth * 3);
 }

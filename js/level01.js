@@ -5,6 +5,8 @@ var Level01 = {
 
         this.weapons = [];
 
+        this.levelFinished = false;
+
         this.lives = config.lives;
 
         this.configureLevel();
@@ -149,6 +151,9 @@ var Level01 = {
     },
 
     timer: function() {
+        if (this.levelFinished) {
+            return;
+        }
         var ship = this.ship;
         var cursors = this.cursors;
         var wasd = this.wasd;
@@ -195,12 +200,38 @@ var Level01 = {
 
         this.target.x += this.map.target.speed;
         if (this.target.x < this.map.target.targetX) {
-            startLevel(constants.MAP_01);
+            this.finishLevel();
         }
     },
 
     render: function() {
 
+    },
+
+    finishLevel: function() {
+        console.log("finishLevel");
+        this.levelFinished = true;
+        this.ship.sprite.body.velocity.set(0, 0);
+
+        var targetX = this.ship.sprite.x - 100;
+        if (targetX <= this.ship.sprite.width) {
+            targetX = this.ship.sprite.width + 10;
+        }
+
+        this.ship.sprite.scope = this;
+        var tween = game.add.tween(this.ship.sprite);
+        tween.onComplete.add(this.shipStoppedBack);
+        tween.to({x: targetX}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+    },
+
+    shipStoppedBack: function(shipSprite) {
+        var tween = game.add.tween(shipSprite);
+        tween.onComplete.add(shipSprite.scope.shipStoppedFront);
+        tween.to({x: (shipSprite.scope.totalWidth - shipSprite.x) + 100}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+    },
+
+    shipStoppedFront: function() {
+        startLevel(constants.MAP_01);
     },
 
     createEnemies: function () {
