@@ -41,7 +41,7 @@ var Map01 = {
         this.background.height = newHeight;
         this.background.width = this.background.width * scale;
 
-        this.ship = game.add.sprite(0, 0, "level01.ship", 2);
+        this.ship = game.add.sprite(0, 0, "ship01", 2);
         this.ship.anchor.set(0.5, 0.5);
         this.ship.animating = false;
 

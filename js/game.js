@@ -92,7 +92,7 @@ var Load = {
         // start loading the asset files
         var sprites = [
             ['bullet', '/assets/sprites/bullet.png'],
-            ['level01.ship', '/res/players/playerShip1_blue.png'],
+            ['ship01', '/res/players/playerShip1_blue.png'],
             ['stone01', '/assets/particlestorm/particles/barkshard.png'],
             ['map01', 'assets/pics/ra_einstein.png'],
             ['background', '/res/bgs/purple.png'],
@@ -122,6 +122,7 @@ var Load = {
         
         var spritesheets = [
             ['explosion', 'assets/games/invaders/explode.png', 128, 128],
+            ['ship01.turbine', '/res/players/fire01.png', 31, 14],
             ['button', '/res/ui/buttons.png', 222, 39]
         ];
         

@@ -41,9 +41,11 @@ var Level01 = {
         this.target.body.moves = false;
         this.scene.add(this.target);
 
+        this.target.width *= 1.5;
+        this.target.height *= 1.5;
+
         // Create ship
         this.ship.sprite = game.add.sprite(320, this.totalHeight / 2, this.ship.spriteName, 2);
-
         game.physics.arcade.enable(this.ship.sprite, Phaser.Physics.ARCADE);
 
         var scale = config.shipWidth / this.ship.sprite.width;
@@ -56,6 +58,20 @@ var Level01 = {
         this.ship.sprite.body.enable = true;
         this.ship.sprite.body.collideWorldBounds = true;
         game.camera.follow(this.ship.sprite, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
+
+        // Create ship turbine
+        this.ship.turbine = game.add.sprite(0, 0, this.ship.turbineSpriteName, 3);
+        this.ship.turbine.x = -this.ship.turbine.width;
+        this.ship.turbine.y = (this.ship.turbine.height / 2) + (this.ship.sprite.height / 2) + 2;
+        this.ship.turbine.animations.add('fire', [0, 1]);
+        this.ship.turbine.animations.play('fire', 2, true);
+
+        this.ship.sprite.addChild(this.ship.turbine);
+
+        // Create ship group
+        //this.ship.group = game.add.group();
+        //this.ship.group.add(this.ship.sprite);
+        //this.ship.group.add(this.ship.turbine);
 
         this.createEnemies();
         this.scene.add(this.enemies);
@@ -209,7 +225,6 @@ var Level01 = {
     },
 
     finishLevel: function() {
-        console.log("finishLevel");
         this.levelFinished = true;
         this.ship.sprite.body.velocity.set(0, 0);
 
@@ -222,6 +237,8 @@ var Level01 = {
         var tween = game.add.tween(this.ship.sprite);
         tween.onComplete.add(this.shipStoppedBack);
         tween.to({x: targetX}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+        completeLevel(0, 0);
     },
 
     shipStoppedBack: function(shipSprite) {
@@ -286,7 +303,8 @@ var Level01 = {
         }
 
         this.ship = {
-            spriteName: 'level01.ship',
+            spriteName: 'ship01',
+            turbineSpriteName: 'ship01.turbine',
             acceleration: 200,
             dragForce: 400,
             maxSpeed: 800,
@@ -305,7 +323,7 @@ var Level01 = {
             target: {
                 speed: -2,
                 targetX: config.width + (config.width * 0.2),
-                x: 4000
+                x: 3000
             },
             stones: {
                 count: 10,
