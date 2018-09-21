@@ -1,4 +1,4 @@
-var Asteroid = function(game, spriteName, mapWidth, mapHeight) {
+var Asteroid = function(game, spriteName, mapWidth, mapHeight, onFinish) {
     Phaser.Sprite.call(this, game,
         game.rnd.integerInRange(mapWidth, mapWidth + 100),
         game.rnd.integerInRange(0, mapHeight),
@@ -15,11 +15,12 @@ var Asteroid = function(game, spriteName, mapWidth, mapHeight) {
     this.initialLife = this.life = 20;
     this.name = "asteroid";
     this.visible = false;
+    this.onFinish = onFinish;
 }
 
-var RotatorEnemy = function(game, spriteName, mapWidth, mapHeight) {
+var RotatorEnemy = function(game, spriteName, mapWidth, mapHeight, onFinish) {
     Phaser.Sprite.call(this, game,
-        game.rnd.integerInRange(mapWidth, mapWidth + 100),
+        game.rnd.integerInRange(mapWidth + 100, mapWidth + 200),
         game.rnd.integerInRange(0, mapHeight),
         spriteName
     );
@@ -34,6 +35,7 @@ var RotatorEnemy = function(game, spriteName, mapWidth, mapHeight) {
     this.initialLife = this.life = 10;
     this.name = "rotatorEnemy";
     this.visible = false;
+    this.onFinish = onFinish;
 }
 
 Asteroid.prototype = Object.create(Phaser.Sprite.prototype);
@@ -73,7 +75,7 @@ RotatorEnemy.prototype.hit = Asteroid.prototype.hit = function(damage) {
         if (this.mustRestart) {
             this.restart();
         } else {
-            this.kill();
+            this.onFinish();
         }
     }
 };
@@ -81,7 +83,11 @@ RotatorEnemy.prototype.hit = Asteroid.prototype.hit = function(damage) {
 RotatorEnemy.prototype.timer = Asteroid.prototype.timer = function() {
     this.body.velocity.set(this.velocity, 0);
     if (this.body.position.x < 0) {
-        this.restart();
+        if (this.mustRestart) {
+            this.restart();
+        } else {
+            this.onFinish();
+        }
     }
 };
 

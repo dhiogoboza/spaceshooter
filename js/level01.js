@@ -73,7 +73,9 @@ var Level01 = {
         //this.ship.group.add(this.ship.sprite);
         //this.ship.group.add(this.ship.turbine);
 
-        this.createEnemies();
+        this.enemies = game.add.group();
+        this.enemies.enableBody = true;
+        this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
         this.scene.add(this.enemies);
 
         this.createWeapons();
@@ -90,8 +92,11 @@ var Level01 = {
         this.foreground.bringToTop();
         
         game.time.events.loop(config.timerDelay, this.timer, this);
+        game.time.events.loop(1000, this.scriptTimer, this);
 
         this.createHud();
+        
+        this.startTime = this.game.time.totalElapsedSeconds();
     },
     
     createHud: function() {
@@ -220,6 +225,28 @@ var Level01 = {
         }
     },
 
+    scriptTimer: function() {
+        var currentTime = this.game.time.totalElapsedSeconds() - this.startTime;
+        if (this.map.scripts.length) {
+            var next = this.map.scripts[0];
+
+            if (next.start >= currentTime) {
+                this.map.actionsRunning.push();
+                this.map.scripts.shift();
+                next.onStart(this);
+            }
+        }
+
+        if (this.map.actionsRunning.length) {
+            var next = this.map.actionsRunning[0];
+
+            if (next.end >= currentTime) {
+                this.map.actionsRunning.shift();
+                next.onFinish(this);
+            }
+        }
+    },
+
     render: function() {
 
     },
@@ -251,30 +278,17 @@ var Level01 = {
         startLevel(constants.MAP_01);
     },
 
-    createEnemies: function () {
-        // https://phaser.io/examples/v2/games/invaders
-        var game = this.game;
-
-        this.enemies = game.add.group();
-        this.enemies.enableBody = true;
-        this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
-
-        var asteroid = new Asteroid(game, "stone01", config.width, config.height);
-        this.enemies.add(asteroid);
-        asteroid.start();
-
-        var enemy01 = new RotatorEnemy(game, "enemy01", config.width, config.height);
-        this.enemies.add(enemy01);
-        enemy01.start();
-    },
-
     hitShip: function(ship, enemy, state) {
         enemy.hit(-1);
-        if (this.lives == 0) {
-            this.gameOver();
-        } else {
+        if (this.levelFinished) {
+            return;
+        }
+
+        if (this.lives) {
             this.lives--;
             this.hudLives.children[this.lives].kill();
+        } else {
+            this.gameOver();
         }
     },
 
@@ -316,6 +330,13 @@ var Level01 = {
         }
     },
 
+    destroyEnemy: function() {
+        this.parent.remove(this);
+
+        this.kill();
+        this.destroy();
+    },
+
     configureLevel: function() {
         this.map = {
             verticalPadding: 200,
@@ -335,7 +356,34 @@ var Level01 = {
                     fireRate: 50,
                     bulletSpeed: 1500
                 }
-            }
+            },
+            scripts: [Level01.Action01],
+            actionsRunning: [Level01.Action01]
+        }
+    },
+
+    Action01: {
+        start: 5,
+
+        end: 8,
+
+        executed: false,
+
+        onStart: function (level01) {
+            // https://phaser.io/examples/v2/games/invaders
+            this.asteroid = new Asteroid(game, "stone01", level01.totalWidth, level01.totalHeight, level01.destroyEnemy);
+            level01.enemies.add(this.asteroid);
+            this.asteroid.start();
+
+            this.rotator = new RotatorEnemy(game, "enemy01", level01.totalWidth, level01.totalHeight, level01.destroyEnemy);
+            level01.enemies.add(this.rotator);
+            this.rotator.start();
+        },
+
+        onFinish: function (level01) {
+            // https://phaser.io/examples/v2/games/invaders
+            this.asteroid.mustRestart = false;
+            this.rotator.mustRestart = false;
         }
     }
-}
+};
