@@ -32,18 +32,6 @@ var Level01 = {
                 this.totalHeight - fh, this.totalWidth, this.totalHeight, 'foreground');
         this.foreground.autoScroll(-60, 0);
 
-        var mh = 200;
-        this.target = new Phaser.Sprite(game, this.map.target.x, this.totalHeight / 2, "map01.membrane");
-        this.target.anchor.set(0.5, 0.5);
-
-        game.physics.arcade.enable(this.target, Phaser.Physics.ARCADE);
-        this.target.body.immovable = true;
-        this.target.body.moves = false;
-        this.scene.add(this.target);
-
-        this.target.width *= 1.5;
-        this.target.height *= 1.5;
-
         // Create ship
         this.ship.sprite = game.add.sprite(320, this.totalHeight / 2, this.ship.spriteName, 2);
         game.physics.arcade.enable(this.ship.sprite, Phaser.Physics.ARCADE);
@@ -67,11 +55,6 @@ var Level01 = {
         this.ship.turbine.animations.play('fire', 2, true);
 
         this.ship.sprite.addChild(this.ship.turbine);
-
-        // Create ship group
-        //this.ship.group = game.add.group();
-        //this.ship.group.add(this.ship.sprite);
-        //this.ship.group.add(this.ship.turbine);
 
         this.enemies = game.add.group();
         this.enemies.enableBody = true;
@@ -163,12 +146,14 @@ var Level01 = {
 
     update: function() {
         // ---> http://jsbin.com/pinone/1/edit?js,output
-        var weapon = this.weapons[this.currentWeapon];
-        this.game.physics.arcade.collide(this.ship.sprite, this.target);
-
         this.game.physics.arcade.overlap(this.ship.sprite, this.enemies, this.hitShip, null, this);
-        this.game.physics.arcade.overlap(weapon, this.enemies, this.hitEnemy, null, this);
-        this.game.physics.arcade.overlap(weapon, this.target, this.hitTarget, null, this);
+        this.game.physics.arcade.overlap(this.weapons[this.currentWeapon], this.enemies, this.hitEnemy, null, this);
+
+        for (var i = 0; i < this.map.actionsRunning.length; i++) {
+            if (this.map.actionsRunning[i].onUpdate) {
+                this.map.actionsRunning[i].onUpdate(this);
+            }
+        }
     },
 
     timer: function() {
@@ -219,19 +204,23 @@ var Level01 = {
             this.enemies.children[i].timer();
         }
 
-        this.target.x += this.map.target.speed;
-        if (this.target.x < this.map.target.targetX) {
-            this.finishLevel();
+        for (var i = 0; i < this.map.actionsRunning.length; i++) {
+            if (this.map.actionsRunning[i].onTimer) {
+                this.map.actionsRunning[i].onTimer(this);
+            }
         }
     },
 
     scriptTimer: function() {
         var currentTime = this.game.time.totalElapsedSeconds() - this.startTime;
+        console.log("currentTime: " + currentTime);
         if (this.map.scripts.length) {
             var next = this.map.scripts[0];
 
-            if (next.start >= currentTime) {
-                this.map.actionsRunning.push();
+            if (currentTime >= next.start) {
+                console.log("next added");
+                console.log(next);
+                this.map.actionsRunning.push(next);
                 this.map.scripts.shift();
                 next.onStart(this);
             }
@@ -239,8 +228,10 @@ var Level01 = {
 
         if (this.map.actionsRunning.length) {
             var next = this.map.actionsRunning[0];
+            if (next.end > 0 && currentTime >= next.end) {
+                console.log("next removed");
+                console.log(next);
 
-            if (next.end >= currentTime) {
                 this.map.actionsRunning.shift();
                 next.onFinish(this);
             }
@@ -338,13 +329,13 @@ var Level01 = {
     },
 
     configureLevel: function() {
+        var hp = 200;
         this.map = {
             verticalPadding: 200,
-            horizontalPadding: 200,
+            horizontalPadding: hp,
             target: {
                 speed: -2,
-                targetX: config.width + (config.width * 0.2),
-                x: 3000
+                x: (game.width + (2 * hp)) / 2
             },
             stones: {
                 count: 10,
@@ -357,14 +348,13 @@ var Level01 = {
                     bulletSpeed: 1500
                 }
             },
-            scripts: [Level01.Action01],
-            actionsRunning: [Level01.Action01]
+            scripts: [Level01.Action01, Level01.ActionTarget],
+            actionsRunning: []
         }
     },
 
     Action01: {
         start: 5,
-
         end: 8,
 
         executed: false,
@@ -380,10 +370,47 @@ var Level01 = {
             this.rotator.start();
         },
 
+        onUpdate: undefined,
+        onTimer: undefined,
+
         onFinish: function (level01) {
             // https://phaser.io/examples/v2/games/invaders
             this.asteroid.mustRestart = false;
             this.rotator.mustRestart = false;
+        }
+    },
+    
+    ActionTarget: {
+        start: 10,
+        end: -1,
+
+        executed: false,
+
+        onStart: function (level01) {
+            this.target = new Phaser.Sprite(game, level01.totalWidth + 1000, level01.totalHeight / 2, "map01.membrane");
+            this.target.anchor.set(0.5, 0.5);
+            this.target.x = level01.totalWidth + this.target.width;
+
+            game.physics.arcade.enable(this.target, Phaser.Physics.ARCADE);
+            this.target.body.immovable = true;
+            this.target.body.moves = false;
+            level01.scene.add(this.target);
+
+            this.target.width *= 1.5;
+            this.target.height *= 1.5;
+        },
+
+        onUpdate: function(level01) {
+            level01.game.physics.arcade.collide(level01.ship.sprite, this.target);
+            level01.game.physics.arcade.overlap(level01.weapons[level01.currentWeapon], this.target, level01.hitTarget, null, level01);
+        },
+
+        onTimer: function(level01) {
+            this.target.x += level01.map.target.speed;
+            if (this.target.x < level01.map.target.targetX) {
+                level01.finishLevel();
+                this.target.kill();
+            }
         }
     }
 };
