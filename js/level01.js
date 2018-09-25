@@ -213,7 +213,6 @@ var Level01 = {
 
     scriptTimer: function() {
         var currentTime = this.game.time.totalElapsedSeconds() - this.startTime;
-        console.log("currentTime: " + currentTime);
         if (this.map.scripts.length) {
             var next = this.map.scripts[0];
 
@@ -242,6 +241,10 @@ var Level01 = {
 
     },
 
+    startBoss: function() {
+        
+    },
+
     finishLevel: function() {
         this.levelFinished = true;
         this.ship.sprite.body.velocity.set(0, 0);
@@ -262,7 +265,7 @@ var Level01 = {
     shipStoppedBack: function(shipSprite) {
         var tween = game.add.tween(shipSprite);
         tween.onComplete.add(shipSprite.scope.shipStoppedFront);
-        tween.to({x: (shipSprite.scope.totalWidth - shipSprite.x) + 100}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+        tween.to({x: shipSprite.scope.totalWidth + shipSprite.x}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
     },
 
     shipStoppedFront: function() {
@@ -331,11 +334,11 @@ var Level01 = {
     configureLevel: function() {
         var hp = 200;
         this.map = {
-            verticalPadding: 200,
+            verticalPadding: 250,
             horizontalPadding: hp,
             target: {
                 speed: -2,
-                x: (game.width + (2 * hp)) / 2
+                scale: 1
             },
             stones: {
                 count: 10,
@@ -356,8 +359,7 @@ var Level01 = {
     Action01: {
         start: 5,
         end: 8,
-
-        executed: false,
+        finished: false,
 
         onStart: function (level01) {
             // https://phaser.io/examples/v2/games/invaders
@@ -383,21 +385,22 @@ var Level01 = {
     ActionTarget: {
         start: 10,
         end: -1,
-
-        executed: false,
+        finished: false,
 
         onStart: function (level01) {
-            this.target = new Phaser.Sprite(game, level01.totalWidth + 1000, level01.totalHeight / 2, "map01.membrane");
+            this.target = game.add.sprite(level01.totalWidth + 1000, level01.totalHeight / 2, "map01.membrane");
             this.target.anchor.set(0.5, 0.5);
             this.target.x = level01.totalWidth + this.target.width;
 
             game.physics.arcade.enable(this.target, Phaser.Physics.ARCADE);
+            console.log(this.target.body)
+            this.target.body.setCircle(this.target.width / 2);
             this.target.body.immovable = true;
             this.target.body.moves = false;
-            level01.scene.add(this.target);
+            this.target.width *= level01.map.target.scale;
+            this.target.height *= level01.map.target.scale;
 
-            this.target.width *= 1.5;
-            this.target.height *= 1.5;
+            level01.scene.add(this.target);
         },
 
         onUpdate: function(level01) {
@@ -406,10 +409,12 @@ var Level01 = {
         },
 
         onTimer: function(level01) {
-            this.target.x += level01.map.target.speed;
-            if (this.target.x < level01.map.target.targetX) {
-                level01.finishLevel();
-                this.target.kill();
+            if (!this.finished) {
+                this.target.x += level01.map.target.speed;
+                if (this.target.x <= level01.totalWidth) {
+                    this.finished = true;
+                    level01.startBoss();
+                }
             }
         }
     }
