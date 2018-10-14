@@ -154,6 +154,18 @@ window.onload = function() {
     });
 };
 
+window.onresize = function() {
+    config.width = window.innerWidth;
+    config.height = window.innerHeight;
+    
+    game.width = config.width;
+    game.height = config.height;
+
+    if (game.state.getCurrentState().onResize !== undefined) {
+        game.state.getCurrentState().onResize();
+    }
+};
+
 function initGame() {
     var gameContainer = document.getElementById("game-content");
     var width = config.width;

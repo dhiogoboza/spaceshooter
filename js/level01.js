@@ -13,18 +13,26 @@ var Level01 = {
         this.configureShip();
     },
 
-    create: function() {
+    updateDimensions: function() {
         this.totalHeight = game.height + this.map.verticalPadding * 2;
         this.totalWidth = game.width + this.map.horizontalPadding * 2;
 
         game.world.setBounds(0, 0, this.totalWidth, this.totalHeight);
+        
+        this.background.width = this.totalWidth;
+        this.background.height = this.totalHeight;
+    },
+
+    create: function() {
+        this.background = new Phaser.TileSprite(game, 0, 0, game.width, game.height, 'background');
+        this.background.autoScroll(-40, 0);
+
+        this.updateDimensions();
 
         this.scene = game.add.group();
         this.scene.x = 0;
         this.scene.y = 0;
 
-        this.background = new Phaser.TileSprite(game, 0, 0, this.totalWidth, this.totalHeight, 'background');
-        this.background.autoScroll(-40, 0);
         this.scene.add(this.background);
 
         var fh = 1150;
@@ -81,7 +89,11 @@ var Level01 = {
         
         this.startTime = this.game.time.totalElapsedSeconds();
     },
-    
+
+    onResize: function() {
+        this.updateDimensions();
+    },
+
     createHud: function() {
         // create hud group
         this.hud = game.add.group();

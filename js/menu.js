@@ -5,6 +5,8 @@ var Menu = {
         this.lastKeyTime = 0;
         this.keysTime = 100;
         this.menuAnimating = false;
+        this.keysBuffer = [];
+        this.maxBufferSize = 5;
     },
 
     create: function() {
@@ -26,12 +28,31 @@ var Menu = {
 
         this.select = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
         this.cursors = game.input.keyboard.createCursorKeys();
+
         this.wasd = {
             up: game.input.keyboard.addKey(Phaser.Keyboard.W),
             down: game.input.keyboard.addKey(Phaser.Keyboard.S),
             right: game.input.keyboard.addKey(Phaser.Keyboard.D),
             left: game.input.keyboard.addKey(Phaser.Keyboard.A)
         };
+
+        for (var prop in this.cursors) {
+            if (this.cursors.hasOwnProperty(prop)) {
+                this.cursors[prop].context = this;
+                this.cursors[prop].onHoldCallback = function(key) {
+                    key.context.onKeyPressed(key.context, key.keyCode);
+                }
+            }
+        }
+
+        for (var prop in this.wasd) {
+            if (this.wasd.hasOwnProperty(prop)) {
+                this.wasd[prop].context = this;
+                this.wasd[prop].onHoldCallback = function(key) {
+                    key.context.onKeyPressed(key.context, key.keyCode);
+                }
+            }
+        }
     },
     
     createButtons: function() {
@@ -76,20 +97,23 @@ var Menu = {
         this.selectorLeft.alpha = 0;
         this.selectorLeft.scope = this;
         this.selectorLeft.anchor.set(0.5, 0.5);
+
+        this.halfButton = startButton.width / 2;
     },
 
     updateMenu: function() {
         var currentMenu = this.buttons.children[this.currentPosition];
 
-        var rx = currentMenu.x + (currentMenu.width / 2);
-        var lx = currentMenu.x - (currentMenu.width / 2);
+        var rx = currentMenu.x + this.halfButton;
+        var lx = currentMenu.x - this.halfButton;
 
         var y = currentMenu.y;
 
-        var tween = game.add.tween(this.selectorLeft).to({x: lx, y: y}, 100, Phaser.Easing.Linear.None, true);
-
-        var tween = game.add.tween(this.selectorRight).to({x: rx, y: y}, 100, Phaser.Easing.Linear.None, true);
+        var tween = game.add.tween(this.selectorRight);
         tween.onComplete.add(this.stopAnimation);
+        tween.to({x: rx, y: y}, 100, Phaser.Easing.Linear.None, true);
+
+        game.add.tween(this.selectorLeft).to({x: lx, y: y}, 100, Phaser.Easing.Linear.None, true);
     },
 
     showButtons: function(obj) {
@@ -117,6 +141,16 @@ var Menu = {
         obj.scope.menuAnimating = false;
     },
 
+    onKeyPressed: function(context, keyCode) {
+        var currentTime = context.game.time.time;
+
+        if (currentTime - context.lastKeyTime >= context.keysTime &&
+            context.keysBuffer.length < context.maxBufferSize) {
+            context.keysBuffer.push(keyCode);
+            context.lastKeyTime = currentTime;
+        }
+    },
+
     update: function() {
         if (this.select.isDown) {
             switch (this.currentPosition) {
@@ -124,22 +158,28 @@ var Menu = {
                     startLevel(constants.MAP_01);
                     break;
             }
-        } else if (!this.menuAnimating) {
-            this.menuAnimating = true;
-            if (this.cursors.up.isDown || this.wasd.up.isDown) {
-                this.currentPosition--;
-
-                if (this.currentPosition < 0) {
-                    this.currentPosition = this.buttons.length - 1;
+        } else {
+            if (!this.menuAnimating && this.keysBuffer.length) {
+                this.menuAnimating = true;
+                var currentKey = this.keysBuffer.shift();
+                switch (currentKey) {
+                    case Phaser.KeyCode.UP:
+                    case Phaser.KeyCode.W:
+                        this.currentPosition--;
+                        if (this.currentPosition < 0) {
+                            this.currentPosition = this.buttons.length - 1;
+                        }
+                        break;
+                    case Phaser.KeyCode.DOWN:
+                    case Phaser.KeyCode.S:
+                        this.currentPosition++;
+                        if (this.currentPosition === this.buttons.length) {
+                            this.currentPosition = 0;
+                        }
+                        break;
                 }
-            } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
-                this.currentPosition++;
-
-                if (this.currentPosition === this.buttons.length) {
-                    this.currentPosition = 0;
-                }
+                this.updateMenu();
             }
-            this.updateMenu();
         }
     },
 
