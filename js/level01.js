@@ -475,8 +475,8 @@ var Level01 = {
         end: 46,
         finished: false,
 
-        onStart: function (currentLevel) {
-            this.target = game.add.sprite(currentLevel.totalWidth + 1000, currentLevel.totalHeight / 2, "map01.boss");
+        onStart: function (level01) {
+            this.target = game.add.sprite(level01.totalWidth + 1000, level01.totalHeight / 2, "map01.boss");
             this.target.anchor.set(0.5, 0.5);
             this.target.x = currentLevel.totalWidth + this.target.width;
 
