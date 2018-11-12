@@ -114,7 +114,7 @@ var Map01 = {
         }
 
         if (this.selectLevel.isDown) {
-            startLevel("level0" + (this.currentMapPostion + 1));
+            startLevel(levels[this.currentMapPostion]);
         } else {
             var target;
             if (this.cursors.left.isDown || this.wasd.left.isDown) {

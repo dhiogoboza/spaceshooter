@@ -1,4 +1,4 @@
-var LevelBoss = {
+var Level01 = {
     init: function () {
         this.game.renderer.renderSession.roundPixels = true;
         this.physics.startSystem(Phaser.Physics.ARCADE);
@@ -11,7 +11,6 @@ var LevelBoss = {
 
         this.configureLevel();
         this.configureShip();
-        alert("level boss");
     },
 
     updateDimensions: function() {
@@ -359,7 +358,7 @@ var LevelBoss = {
                     bulletSpeed: 1500
                 }
             },
-            scripts: [LevelBoss.Action01, LevelBoss.ActionTarget],
+            scripts: [Level01.Action01, Level01.ActionTarget],
             actionsRunning: []
         }
     },
@@ -368,8 +367,11 @@ var LevelBoss = {
         start: 5,
         end: 8,
         finished: false,
+        asteroids:
 
         onStart: function (currentLevel) {
+            // asterois and rotator enemies
+
             // https://phaser.io/examples/v2/games/invaders
             this.asteroid = new Asteroid(game, "stone01", currentLevel.totalWidth, currentLevel.totalHeight, currentLevel.destroyEnemy);
             currentLevel.enemies.add(this.asteroid);
@@ -393,7 +395,7 @@ var LevelBoss = {
     
     ActionTarget: {
         start: 10,
-        end: -1,
+        end: 18,
         finished: false,
 
         onStart: function (currentLevel) {
@@ -417,14 +419,10 @@ var LevelBoss = {
                     this.target, currentLevel.hitTarget, null, currentLevel);
         },
 
-        onTimer: function(currentLevel) {
-            if (!this.finished) {
-                this.target.x += currentLevel.map.target.speed;
-                if (this.target.x <= currentLevel.totalWidth) {
-                    this.finished = true;
-                    currentLevel.startBoss();
-                }
-            }
+        onTimer: undefined,
+
+        onFinish: function (currentLevel) {
+            currentLevel.finishLevel();
         }
     }
 };

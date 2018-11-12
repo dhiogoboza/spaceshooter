@@ -7,7 +7,8 @@ var constants = {
     LOAD: "load",
     MENU: "menu",
     MAP_01: "map01",
-    LEVEL_01: "level01"
+    LEVEL_01: "level01",
+    LEVEL_BOSS: "levelBoss"
 };
 
 var config = {
@@ -59,6 +60,7 @@ var first = true;
 var game;
 var text;
 var currentLevel;
+var levels = [constants.LEVEL_01, constants.LEVEL_BOSS];
 
 var Boot = {
     preload : function () {
@@ -115,7 +117,7 @@ var Load = {
         }
         
         var spritesheets = [
-            ['explosion', 'assets/particlestorm/explode.png', 128, 128],
+            ['explosion', 'assets/particlestorm/explosion.png', 128, 128],
             ['ship01.turbine', '/assets/players/fire01.png', 31, 14],
             ['button', '/assets/ui/buttons.png', 222, 39]
         ];
@@ -180,6 +182,7 @@ function initGame() {
     game.state.add(constants.MENU, Menu);
     game.state.add(constants.MAP_01, Map01);
     game.state.add(constants.LEVEL_01, Level01);
+    game.state.add(constants.LEVEL_BOSS, LevelBoss);
 
     startLevel(constants.BOOT);
 }

@@ -7,7 +7,7 @@ var Asteroid = function(game, spriteName, mapWidth, mapHeight, onFinish) {
 
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
-    this.mustRestart = true;
+    this.mustRestart = false;
     
     this.mass = 100;
     this.velocity = -100;
@@ -46,8 +46,25 @@ RotatorEnemy.prototype.constructor = RotatorEnemy;
 
 // ================ COMMON FUNCTIONS ===================== //
 
-RotatorEnemy.prototype.start = Asteroid.prototype.start = function() {
+RotatorEnemy.prototype.start = function() {
+    this.enableBody = true;
+    this.physicsBodyType = Phaser.Physics.ARCADE;
+    this.body.immovable = false;
+    this.body.mass = this.mass;
+    this.body.velocity.x = this.velocity;
+    this.anchor.set(0.5, 0.5);
+    console.log("criou");
+    game.add.tween(this).to( { angle: 360 }, 6000, Phaser.Easing.Linear.None, true, 0, 1000, false);
     this.visible = true;
+}
+
+Asteroid.prototype.start = function() {
+    this.visible = true;
+    this.enableBody = true;
+    this.physicsBodyType = Phaser.Physics.ARCADE;
+    this.body.immovable = false;
+    this.body.mass = this.mass;
+    this.body.velocity.x = this.velocity;
 };
 
 RotatorEnemy.prototype.restart = Asteroid.prototype.restart = function() {
@@ -89,24 +106,5 @@ RotatorEnemy.prototype.timer = Asteroid.prototype.timer = function() {
             this.onFinish();
         }
     }
-};
-
-// ================ CUSTOM FUNCTIONS ===================== //
-
-RotatorEnemy.prototype.create = function() {
-    this.enableBody = true;
-    this.physicsBodyType = Phaser.Physics.ARCADE;
-    this.body.immovable = false;
-    this.body.mass = this.mass;
-    this.body.velocity.x = this.velocity;
-    game.add.tween(this).to( { angle: 360 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, false);
-};
-
-Asteroid.prototype.create = function() {
-    this.enableBody = true;
-    this.physicsBodyType = Phaser.Physics.ARCADE;
-    this.body.immovable = false;
-    this.body.mass = this.mass;
-    this.body.velocity.x = this.velocity;
 };
 
