@@ -63,7 +63,7 @@ var currentLevel;
 var Boot = {
     preload : function () {
         console.log("boot preload");
-        game.load.image('loadingbar', '/res/ui/loader.png');
+        game.load.image('loadingbar', '/assets/ui/loader.png');
     },
 
     // create method
@@ -91,29 +91,23 @@ var Load = {
  
         // start loading the asset files
         var sprites = [
-            ['bullet', '/assets/sprites/bullet.png'],
-            ['ship01', '/res/players/playerShip1_blue.png'],
-            ['stone01', '/assets/particlestorm/particles/barkshard.png'],
-            ['map01', 'assets/pics/ra_einstein.png'],
-            ['background', '/res/bgs/purple.png'],
+            ['ship01', '/assets/players/playerShip1_blue.png'],
+            ['stone01', '/assets/particlestorm/barkshard.png'],
+            ['background', '/assets/bgs/purple.png'],
             ['foreground', '/assets/wip/karamoon.png'],
-            ['enemy01', '/res/enemies/ufoRed.png'],
+            ['enemy01', '/assets/enemies/ufoRed.png'],
 
-            ['map01.membrane', '/res/organelles/membrane.png'],
-            ['map01.mitocondria', '/res/organelles/mitocondria.png'],
-            ['map01.lisossomo', '/res/organelles/lisossomo.png'],
-            ['map01.golgi', '/res/organelles/golgi.png'],
+            ['map01.boss', '/assets/enemies/boss01.png'],
 
-            ['ui.station01', '/res/ui/station01.png'],
-            ['ui.lock', '/res/ui/lock.png'],
+            ['ui.station01', '/assets/ui/station01.png'],
+            ['ui.lock', '/assets/ui/lock.png'],
 
-            ['menu.background', '/res/bgs/menu.jpg'],
-            ['menu.redButton', '/res/ui/buttonRed.png'],
-            ['menu.yellowButton', '/res/ui/buttonYellow.png'],
-            ['menu.selectorRight', '/res/ui/selector_right.png'],
-            ['menu.selectorLeft', '/res/ui/selector_left.png'],
+            ['menu.background', '/assets/bgs/menu.jpg'],
+            ['menu.redButton', '/assets/ui/buttonRed.png'],
+            ['menu.yellowButton', '/assets/ui/buttonYellow.png'],
+            ['menu.selector', '/assets/ui/selector.png'],
 
-            ['hud.life', '/res/ui/playerLife1_blue.png']
+            ['hud.life', '/assets/ui/playerLife1_blue.png']
         ];
         
         for (var i = 1; i <= 11; i++) {
@@ -121,9 +115,9 @@ var Load = {
         }
         
         var spritesheets = [
-            ['explosion', 'assets/games/invaders/explode.png', 128, 128],
-            ['ship01.turbine', '/res/players/fire01.png', 31, 14],
-            ['button', '/res/ui/buttons.png', 222, 39]
+            ['explosion', 'assets/particlestorm/explode.png', 128, 128],
+            ['ship01.turbine', '/assets/players/fire01.png', 31, 14],
+            ['button', '/assets/ui/buttons.png', 222, 39]
         ];
         
         for (var i = 0; i < sprites.length; i++) {
@@ -134,9 +128,6 @@ var Load = {
             var sheet = spritesheets[i];
             game.load.spritesheet(sheet[0], sheet[1], sheet[2], sheet[3]);
         }
-        
-        this.game.load.bitmapFont('myfont', 'assets/font/font.png', 'assets/font/font.fnt');
- 
     },
 
     // when done create will be called

@@ -3,7 +3,7 @@ var Menu = {
         game.renderer.renderSession.roundPixels = true;
         this.currentPosition = 0;
         this.lastKeyTime = 0;
-        this.keysTime = 100;
+        this.keysTime = 300;
         this.menuAnimating = false;
         this.keysBuffer = [];
         this.maxBufferSize = 5;
@@ -33,7 +33,8 @@ var Menu = {
             up: game.input.keyboard.addKey(Phaser.Keyboard.W),
             down: game.input.keyboard.addKey(Phaser.Keyboard.S),
             right: game.input.keyboard.addKey(Phaser.Keyboard.D),
-            left: game.input.keyboard.addKey(Phaser.Keyboard.A)
+            left: game.input.keyboard.addKey(Phaser.Keyboard.A),
+            enter: game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
         };
 
         for (var prop in this.cursors) {
@@ -87,16 +88,11 @@ var Menu = {
 
         var tween = game.add.tween(text).to({alpha: 1}, 1500, Phaser.Easing.Linear.None, true, 0, 0, false);
         tween.onComplete.add(this.showButtons);
-        
-        this.selectorRight = game.add.image(0, 0, 'menu.selectorRight');
-        this.selectorRight.alpha = 0;
-        this.selectorRight.scope = this;
-        this.selectorRight.anchor.set(0.5, 0.5);
 
-        this.selectorLeft = game.add.image(0, 0, 'menu.selectorLeft');
-        this.selectorLeft.alpha = 0;
-        this.selectorLeft.scope = this;
-        this.selectorLeft.anchor.set(0.5, 0.5);
+        this.selector = game.add.image(0, 0, 'menu.selector');
+        this.selector.alpha = 0;
+        this.selector.scope = this;
+        this.selector.anchor.set(0.5, 0.5);
 
         this.halfButton = startButton.width / 2;
     },
@@ -104,16 +100,12 @@ var Menu = {
     updateMenu: function() {
         var currentMenu = this.buttons.children[this.currentPosition];
 
-        var rx = currentMenu.x + this.halfButton;
-        var lx = currentMenu.x - this.halfButton;
-
+        var rx = currentMenu.x;
         var y = currentMenu.y;
 
-        var tween = game.add.tween(this.selectorRight);
+        var tween = game.add.tween(this.selector);
         tween.onComplete.add(this.stopAnimation);
         tween.to({x: rx, y: y}, 100, Phaser.Easing.Linear.None, true);
-
-        game.add.tween(this.selectorLeft).to({x: lx, y: y}, 100, Phaser.Easing.Linear.None, true);
     },
 
     showButtons: function(obj) {
@@ -121,8 +113,7 @@ var Menu = {
             obj.scope.buttons.children[i].alpha = 1;
         }
 
-        obj.scope.selectorRight.alpha = 1;
-        obj.scope.selectorLeft.alpha = 1;
+        obj.scope.selector.alpha = 1;
     },
 
     startGame: function() {
@@ -143,44 +134,40 @@ var Menu = {
 
     onKeyPressed: function(context, keyCode) {
         var currentTime = context.game.time.time;
-
-        if (currentTime - context.lastKeyTime >= context.keysTime &&
-            context.keysBuffer.length < context.maxBufferSize) {
-            context.keysBuffer.push(keyCode);
-            context.lastKeyTime = currentTime;
+        if (currentTime - context.lastKeyTime >= context.keysTime && !this.menuAnimating) {
+            this.menuAnimating = true;
+            switch (keyCode) {
+                case Phaser.KeyCode.UP:
+                case Phaser.KeyCode.W:
+                    this.currentPosition--;
+                    if (this.currentPosition < 0) {
+                        this.currentPosition = this.buttons.length - 1;
+                    }
+                    break;
+                case Phaser.KeyCode.DOWN:
+                case Phaser.KeyCode.S:
+                    this.currentPosition++;
+                    if (this.currentPosition === this.buttons.length) {
+                        this.currentPosition = 0;
+                    }
+                    break;
+                case Phaser.KeyCode.ENTER:
+                    switch (this.currentPosition) {
+                        case 0:
+                            startLevel(constants.MAP_01);
+                            break;
+                    }
+                    break;
+                default:
+                    this.menuAnimating = false;
+                    return;
+            }
+            context.updateMenu();
         }
     },
 
     update: function() {
-        if (this.select.isDown) {
-            switch (this.currentPosition) {
-                case 0:
-                    startLevel(constants.MAP_01);
-                    break;
-            }
-        } else {
-            if (!this.menuAnimating && this.keysBuffer.length) {
-                this.menuAnimating = true;
-                var currentKey = this.keysBuffer.shift();
-                switch (currentKey) {
-                    case Phaser.KeyCode.UP:
-                    case Phaser.KeyCode.W:
-                        this.currentPosition--;
-                        if (this.currentPosition < 0) {
-                            this.currentPosition = this.buttons.length - 1;
-                        }
-                        break;
-                    case Phaser.KeyCode.DOWN:
-                    case Phaser.KeyCode.S:
-                        this.currentPosition++;
-                        if (this.currentPosition === this.buttons.length) {
-                            this.currentPosition = 0;
-                        }
-                        break;
-                }
-                this.updateMenu();
-            }
-        }
+
     },
 
     timer: function() {

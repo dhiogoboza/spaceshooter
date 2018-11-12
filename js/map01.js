@@ -29,7 +29,7 @@ var Map01 = {
         this.aTenth = newHeight * 0.1;
 
         game.stage.backgroundColor = "#000000";
-        this.background = game.add.image(this.totalWidth / 2, this.totalHeight / 2, 'map01.membrane');
+        this.background = game.add.image(this.totalWidth / 2, this.totalHeight / 2, 'map01.boss');
         this.background.anchor.set(0.5, 0.5);
 
         // init map

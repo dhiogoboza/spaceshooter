@@ -19,10 +19,6 @@ handlers:
   static_files: index.html
   upload: index.html
 
-- url: /res/(.*)
-  static_files: res/\1
-  upload: res/(.*)
-
 - url: /assets/(.*)
   static_files: assets/\1
   upload: assets/(.*)
@@ -31,17 +27,9 @@ handlers:
   static_files: css/\1
   upload: css/(.*)
 
-- url: /fonts/(.*)
-  static_files: fonts/\1
-  upload: fonts/(.*)
-
 - url: /img/(.*)
   static_files: img/\1
   upload: img/(.*)
-
-- url: /snd/(.*)
-  static_files: snd/\1
-  upload: snd/(.*)
 
 - url: /js/(.*)
   static_files: js/\1
