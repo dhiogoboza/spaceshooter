@@ -365,37 +365,59 @@ var Level01 = {
 
     Action01: {
         start: 5,
-        end: 8,
+        end: 40,
         finished: false,
-        asteroids:
+        asteroids: [],
+        rotators: [],
+
+        removeAsteroid: function() {
+            this.context.asteroids.pop(this);
+            this.context.currentLevel.destroyEnemy();
+        },
+
+        removeRotator: function() {
+            this.context.rotators.pop(this);
+            this.context.currentLevel.destroyEnemy();
+        },
+
+        addAsteroid: function(currentLevel) {
+            // https://phaser.io/examples/v2/games/invaders
+            var asteroid = new Asteroid(game, "stone01", currentLevel.totalWidth, currentLevel.totalHeight, this.removeAsteroid);
+            asteroid.context = this;
+            currentLevel.enemies.add(asteroid);
+            asteroid.start();
+
+            this.asteroids.push(asteroid);
+        },
+
+        addRotator: function(currentLevel) {
+            var rotator = new RotatorEnemy(game, "enemy01", currentLevel.totalWidth, currentLevel.totalHeight, this.removeRotator);
+            rotator.context = this;
+            currentLevel.enemies.add(rotator);
+            rotator.start();
+
+            this.rotators.push(rotator);
+        },
 
         onStart: function (currentLevel) {
-            // asterois and rotator enemies
-
-            // https://phaser.io/examples/v2/games/invaders
-            this.asteroid = new Asteroid(game, "stone01", currentLevel.totalWidth, currentLevel.totalHeight, currentLevel.destroyEnemy);
-            currentLevel.enemies.add(this.asteroid);
-            this.asteroid.start();
-
-            this.rotator = new RotatorEnemy(game, "enemy01", currentLevel.totalWidth,
-                    currentLevel.totalHeight, currentLevel.destroyEnemy);
-            currentLevel.enemies.add(this.rotator);
-            this.rotator.start();
+            this.addAsteroid(currentLevel);
+            this.addRotator(currentLevel);
         },
 
         onUpdate: undefined,
-        onTimer: undefined,
+
+        onTimer: function (currentLevel) {
+            
+        },
 
         onFinish: function (currentLevel) {
-            // https://phaser.io/examples/v2/games/invaders
-            this.asteroid.mustRestart = false;
-            this.rotator.mustRestart = false;
+
         }
     },
     
     ActionTarget: {
-        start: 10,
-        end: 18,
+        start: 41,
+        end: 46,
         finished: false,
 
         onStart: function (currentLevel) {

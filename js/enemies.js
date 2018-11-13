@@ -27,7 +27,7 @@ var RotatorEnemy = function(game, spriteName, mapWidth, mapHeight, onFinish) {
 
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
-    this.mustRestart = true;
+    this.mustRestart = false;
 
     this.mass = 50;
     this.velocity = -150;
@@ -53,7 +53,6 @@ RotatorEnemy.prototype.start = function() {
     this.body.mass = this.mass;
     this.body.velocity.x = this.velocity;
     this.anchor.set(0.5, 0.5);
-    console.log("criou");
     game.add.tween(this).to( { angle: 360 }, 6000, Phaser.Easing.Linear.None, true, 0, 1000, false);
     this.visible = true;
 }
