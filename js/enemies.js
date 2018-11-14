@@ -97,7 +97,7 @@ RotatorEnemy.prototype.hit = Asteroid.prototype.hit = function(damage) {
 };
 
 RotatorEnemy.prototype.timer = Asteroid.prototype.timer = function() {
-    this.body.velocity.set(this.velocity, 0);
+    //this.body.velocity.set(this.velocity, 0);
     if (this.body.position.x < 0) {
         if (this.mustRestart) {
             this.restart();

@@ -81,7 +81,7 @@ var Level01 = {
         };
         this.fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
         this.foreground.bringToTop();
-        
+
         game.time.events.loop(config.timerDelay, this.timer, this);
         game.time.events.loop(1000, this.scriptTimer, this);
 
@@ -211,20 +211,21 @@ var Level01 = {
         if (this.fireButton.isDown || wasd.fire.isDown) {
             this.weapons[this.currentWeapon].fire(this.ship.sprite);
         }
-        
+    },
+
+    scriptTimer: function() {
+        var currentTime = parseInt(this.game.time.totalElapsedSeconds() - this.startTime);
+
         for (var i = 0; i < this.enemies.length; i++) {
-            this.enemies.children[i].timer();
+            this.enemies.children[i].timer(currentTime);
         }
 
         for (var i = 0; i < this.map.actionsRunning.length; i++) {
             if (this.map.actionsRunning[i].onTimer) {
-                this.map.actionsRunning[i].onTimer(this);
+                this.map.actionsRunning[i].onTimer(currentTime);
             }
         }
-    },
 
-    scriptTimer: function() {
-        var currentTime = this.game.time.totalElapsedSeconds() - this.startTime;
         if (this.map.scripts.length) {
             var next = this.map.scripts[0];
 
@@ -331,11 +332,10 @@ var Level01 = {
         }
     },
 
-    destroyEnemy: function() {
-        this.parent.remove(this);
-
-        this.kill();
-        this.destroy();
+    destroyEnemy: function(enemy) {
+        enemy.parent.remove(this);
+        enemy.kill();
+        enemy.destroy();
     },
 
     configureLevel: function() {
@@ -369,45 +369,61 @@ var Level01 = {
         finished: false,
         asteroids: [],
         rotators: [],
+        rotatorsMaxCount: 4,
+        asteroidsMaxCount: 8,
+        lastGeneration: 0,
 
         removeAsteroid: function() {
             this.context.asteroids.pop(this);
-            this.context.currentLevel.destroyEnemy();
+            this.context.currentLevel.destroyEnemy(this);
         },
 
         removeRotator: function() {
             this.context.rotators.pop(this);
-            this.context.currentLevel.destroyEnemy();
+            this.context.currentLevel.destroyEnemy(this);
         },
 
-        addAsteroid: function(currentLevel) {
+        addAsteroid: function() {
             // https://phaser.io/examples/v2/games/invaders
-            var asteroid = new Asteroid(game, "stone01", currentLevel.totalWidth, currentLevel.totalHeight, this.removeAsteroid);
+            var asteroid = new Asteroid(game, "stone01", this.currentLevel.totalWidth,
+                    this.currentLevel.totalHeight, this.removeAsteroid);
             asteroid.context = this;
-            currentLevel.enemies.add(asteroid);
+            this.currentLevel.enemies.add(asteroid);
             asteroid.start();
 
             this.asteroids.push(asteroid);
         },
 
-        addRotator: function(currentLevel) {
-            var rotator = new RotatorEnemy(game, "enemy01", currentLevel.totalWidth, currentLevel.totalHeight, this.removeRotator);
+        addRotator: function() {
+            var rotator = new RotatorEnemy(game, "enemy01", this.currentLevel.totalWidth,
+                    this.currentLevel.totalHeight, this.removeRotator);
             rotator.context = this;
-            currentLevel.enemies.add(rotator);
+            this.currentLevel.enemies.add(rotator);
             rotator.start();
 
             this.rotators.push(rotator);
         },
 
         onStart: function (currentLevel) {
-            this.addAsteroid(currentLevel);
-            this.addRotator(currentLevel);
+            this.currentLevel = currentLevel;
+            this.addAsteroid();
+            this.addRotator();
         },
 
         onUpdate: undefined,
 
-        onTimer: function (currentLevel) {
-            
+        onTimer: function (currentTime) {
+            // generate mobs only in 5 seconds
+            if (currentTime - this.lastGeneration >= 5) {
+                if (this.asteroids.length < this.asteroidsMaxCount) {
+                    this.addAsteroid();
+                    this.lastGeneration = currentTime;
+                } else if (this.rotators.length < this.rotatorsMaxCount) {
+                    this.addRotator();
+                    this.lastGeneration = currentTime;
+                }
+                console.log("gerando em: " + currentTime + ", lg: " + this.lastGeneration);
+            }
         },
 
         onFinish: function (currentLevel) {
