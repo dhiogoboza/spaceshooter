@@ -3,7 +3,7 @@ var Menu = {
         game.renderer.renderSession.roundPixels = true;
         this.currentPosition = 0;
         this.lastKeyTime = 0;
-        this.keysTime = 300;
+        this.keysTime = 200;
         this.menuAnimating = false;
         this.keysBuffer = [];
         this.maxBufferSize = 5;
@@ -135,6 +135,7 @@ var Menu = {
     onKeyPressed: function(context, keyCode) {
         var currentTime = context.game.time.time;
         if (currentTime - context.lastKeyTime >= context.keysTime && !this.menuAnimating) {
+            context.lastKeyTime = currentTime;
             this.menuAnimating = true;
             switch (keyCode) {
                 case Phaser.KeyCode.UP:

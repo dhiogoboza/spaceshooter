@@ -95,9 +95,14 @@ var Load = {
         var sprites = [
             ['ship01', '/assets/players/playerShip1_blue.png'],
             ['stone01', '/assets/particlestorm/barkshard.png'],
-            ['background', '/assets/bgs/purple.png'],
+            ['level01.background', '/assets/bgs/purple.png'],
             ['foreground', '/assets/wip/karamoon.png'],
             ['enemy01', '/assets/enemies/ufoRed.png'],
+            ['virusGreen', '/assets/enemies/virusGreen.png'],
+
+            ['weapon02', '/assets/powerups/weapon02.png'],
+
+            ['levelBoss.background', '/assets/bgs/blue.png'],
 
             ['map01.boss', '/assets/enemies/boss01.png'],
 

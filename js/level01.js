@@ -24,7 +24,7 @@ var Level01 = {
     },
 
     create: function() {
-        this.background = new Phaser.TileSprite(game, 0, 0, game.width, game.height, 'background');
+        this.background = new Phaser.TileSprite(game, 0, 0, game.width, game.height, 'level01.background');
         this.background.autoScroll(-40, 0);
 
         this.updateDimensions();
@@ -127,15 +127,16 @@ var Level01 = {
         this.weapons.push(new Weapon.Combo1(game));
         this.weapons.push(new Weapon.Combo2(game));
 
-        this.currentWeapon = 0;
+        this.currentWeapon = 1;
 
         for (var i = 1; i < this.weapons.length; i++) {
             this.weapons[i].visible = false;
         }
+
+        this.weapons[this.currentWeapon].visible = true;
     },
 
-    nextWeapon: function () {
-
+    changeWeapon: function (newWeapon) {
         //  Tidy-up the current weapon
         if (this.currentWeapon > 9) {
             this.weapons[this.currentWeapon].reset();
@@ -146,14 +147,14 @@ var Level01 = {
         }
 
         //  Activate the new one
-        this.currentWeapon++;
+        this.currentWeapon = newWeapon;
 
-        if (this.currentWeapon === this.weapons.length) {
+        /*if (this.currentWeapon === this.weapons.length) {
             this.currentWeapon = 0;
-        }
+        }*/
 
         this.weapons[this.currentWeapon].visible = true;
-        this.weaponName.text = this.weapons[this.currentWeapon].name;
+        //this.weaponName.text = this.weapons[this.currentWeapon].name;
     },
 
     update: function() {
@@ -281,22 +282,29 @@ var Level01 = {
     },
 
     hitShip: function(ship, enemy, state) {
-        enemy.hit(-1);
-        if (this.levelFinished) {
-            return;
-        }
-
-        if (this.lives) {
-            this.lives--;
-            this.hudLives.children[this.lives].kill();
+        if (enemy.powerUp) {
+            // is a power up
+            enemy.powerUp(this);
         } else {
-            this.gameOver();
+            enemy.hit(-1);
+            if (this.levelFinished) {
+                return;
+            }
+
+            if (this.lives) {
+                this.lives--;
+                this.hudLives.children[this.lives].kill();
+            } else {
+                this.gameOver();
+            }
         }
     },
 
     hitEnemy: function (bullet, enemy) {
-        enemy.hit(bullet.damage);
-        bullet.kill();
+        if (!enemy.powerUp) {
+            enemy.hit(bullet.damage);
+            bullet.kill();
+        }
     },
 
     hitTarget: function(target, bullet) {
@@ -358,13 +366,13 @@ var Level01 = {
                     bulletSpeed: 1500
                 }
             },
-            scripts: [Level01.Action01, Level01.ActionTarget],
+            scripts: [Level01.ActionSimpleEnemies, Level01.ActionPowerUps, Level01.ActionTarget],
             actionsRunning: []
         }
     },
 
-    Action01: {
-        start: 5,
+    ActionSimpleEnemies: {
+        start: 2,
         end: 40,
         finished: false,
         asteroids: [],
@@ -395,7 +403,7 @@ var Level01 = {
         },
 
         addRotator: function() {
-            var rotator = new RotatorEnemy(game, "enemy01", this.currentLevel.totalWidth,
+            var rotator = new RotatorEnemy(game, "virusGreen", this.currentLevel.totalWidth,
                     this.currentLevel.totalHeight, this.removeRotator);
             rotator.context = this;
             this.currentLevel.enemies.add(rotator);
@@ -418,12 +426,43 @@ var Level01 = {
                 if (this.asteroids.length < this.asteroidsMaxCount) {
                     this.addAsteroid();
                     this.lastGeneration = currentTime;
-                } else if (this.rotators.length < this.rotatorsMaxCount) {
+                }
+
+                if (this.rotators.length < this.rotatorsMaxCount) {
                     this.addRotator();
                     this.lastGeneration = currentTime;
                 }
                 console.log("gerando em: " + currentTime + ", lg: " + this.lastGeneration);
             }
+        },
+
+        onFinish: function (currentLevel) {
+
+        }
+    },
+
+    ActionPowerUps: {
+        start: 8,
+        end: 40,
+        finished: false,
+        lastGeneration: 0,
+
+        addPowerUp: function() {
+            var powerUp = new PowerUp(game, "weapon02", this.currentLevel.totalWidth, this.currentLevel.totalHeight);
+            powerUp.context = this;
+            this.currentLevel.enemies.add(powerUp);
+            powerUp.start();
+        },
+
+        onStart: function (currentLevel) {
+            this.currentLevel = currentLevel;
+            this.addPowerUp();
+        },
+
+        onUpdate: undefined,
+
+        onTimer: function (currentTime) {
+            
         },
 
         onFinish: function (currentLevel) {

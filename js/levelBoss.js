@@ -11,7 +11,6 @@ var LevelBoss = {
 
         this.configureLevel();
         this.configureShip();
-        alert("level boss");
     },
 
     updateDimensions: function() {
@@ -25,7 +24,7 @@ var LevelBoss = {
     },
 
     create: function() {
-        this.background = new Phaser.TileSprite(game, 0, 0, game.width, game.height, 'background');
+        this.background = new Phaser.TileSprite(game, 0, 0, game.width, game.height, 'levelBoss.background');
         this.background.autoScroll(-40, 0);
 
         this.updateDimensions();

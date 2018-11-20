@@ -55,6 +55,7 @@ RotatorEnemy.prototype.start = function() {
     this.anchor.set(0.5, 0.5);
     game.add.tween(this).to( { angle: 360 }, 6000, Phaser.Easing.Linear.None, true, 0, 1000, false);
     this.visible = true;
+    this.body.setCircle(this.body.width);
 }
 
 Asteroid.prototype.start = function() {
@@ -64,6 +65,7 @@ Asteroid.prototype.start = function() {
     this.body.immovable = false;
     this.body.mass = this.mass;
     this.body.velocity.x = this.velocity;
+    this.body.setCircle(this.body.width);
 };
 
 RotatorEnemy.prototype.restart = Asteroid.prototype.restart = function() {
