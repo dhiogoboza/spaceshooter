@@ -81,7 +81,7 @@ var Menu = {
         this.buttons.add(aboutButton);
 
         var style = {fill: '#ffffff', 'font': '80px KenvectorFuture'};
-        var text = game.add.text(game.width / 2, (game.height / 2) - 100, 'Intercelular', style);
+        var text = game.add.text(game.width / 2, (game.height / 2) - 100, 'Space Shooter', style);
         text.anchor.set(0.5, 0.5);
         text.alpha = 0;
         text.scope = this;
